@@ -24,7 +24,9 @@ requires = [
     'awesome-slugify',
     'wtforms',
     'markdown2',
-    'pytils'
+    'pytils',
+    'paginate',
+    'paginate_sqlalchemy'
     ]
 
 tests_require = [

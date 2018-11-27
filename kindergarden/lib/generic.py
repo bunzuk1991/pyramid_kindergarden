@@ -26,8 +26,10 @@ from wtforms import (
     TextAreaField,
     IntegerField,
     DecimalField,
-    HiddenField
+    HiddenField,
+    SelectFieldBase
 )
+
 
 DBSession = session
 APP_NAME = 'kindergarden'
@@ -292,7 +294,8 @@ def construct_colum_for_column_type(type_name,
                                     column_max = None,
                                     widget = None,
                                     filter_ = None,
-                                    primary = False
+                                    primary = False,
+                                    rel_class = None
                                     ):
 
     validators_ = []
@@ -320,7 +323,6 @@ def construct_colum_for_column_type(type_name,
             else:
                 lenght_validator = validators.number_range(max=date(column_max, 12, 31))
 
-
     data = {
         'integer': IntegerField(column_name),
         'unicode_text': StringField(column_name),
@@ -328,7 +330,8 @@ def construct_colum_for_column_type(type_name,
         'string': StringField(column_name),
         'decimal': IntegerField(column_name),
         'boolean': BooleanField(column_name),
-        'datetime': DateTimeField(column_name)
+        'datetime': DateTimeField(column_name),
+        'select': SelectFieldBase(column_name, coerce=int)
     }
 
     if type_name in data:
@@ -342,16 +345,16 @@ def construct_colum_for_column_type(type_name,
             current_column.filters = [filter_]
         if primary:
             current_column.widget = widgets.HiddenInput()
+        if rel_class:
+            current_column.choices = [(g.id, g.name) for g in rel_class.query.order_by('id')]
     else:
         current_column = None
 
     return current_column
 
 
-
-
-#generic form
-class GenericForm(object):
+# generic form
+class GenericForm(WTF_form):
     model = None
 
     def __init__(self, model, fields_exclude = None, default_=None, min_=None, max_=None):
@@ -371,12 +374,14 @@ class GenericForm(object):
                 column_max = None
                 column_filter = None
 
-
                 if column_relations.__len__() > 0:
                     for a in column_relations:
                         col_tokens  = a._column_tokens
                         column_relation_table_name = col_tokens[1]
                         column_relation_class = get_class_from_table_name(column_relation_table_name)
+
+                if column_relation_class:
+                    current_field_type = 'select'
 
                 if default_:
                     column_default = default_
@@ -420,9 +425,10 @@ class GenericForm(object):
                     column_default=column_default,
                     column_max=column_max,
                     column_min=column_min,
-                    filter_ = column_filter
+                    filter_=column_filter,
+                    rel_class=column_relation_class,
+                    primary=column_primary_key
                 ))
-
 
 
 def apply_sorting_query(query, request, config, sort_exp='sort_exp', default_exp=None):

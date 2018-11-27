@@ -37,4 +37,6 @@ kindergarden/templates/mytemplate.jinja2
 kindergarden/views/__init__.py
 kindergarden/views/default.py
 kindergarden/views/notfound.py
+kindergarden/views/admin/__init__.py
+kindergarden/views/admin/organisation.py
 kindergarden/views/ganeric/__init__.py
