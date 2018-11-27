@@ -1,0 +1,5 @@
+      [paste.app_factory]
+      main = kindergarden:main
+      [console_scripts]
+      initialize_kindergarden_db = kindergarden.scripts.initializedb:main
+      
