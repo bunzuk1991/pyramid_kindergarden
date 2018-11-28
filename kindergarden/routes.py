@@ -28,6 +28,7 @@ def add_crud_views(config, view, route_name, attrs=None, attrs_except=None, perm
 
     for attr in attrs:
         config.add_view(view, attr=attr, route_name='%s_%s' % (route_name, attr), permission=permission)
+        print("%s   (%s_%s)" % (view, route_name, attr))
 
 
 def includeme(config):
@@ -35,4 +36,3 @@ def includeme(config):
     config.add_route('home', '/')
     add_crud_routes(config, 'organisation')
     add_crud_views(config, 'kindergarden.views.admin.organisation.Organisation', 'organisation')
-    print(config.get_routes_mapper())

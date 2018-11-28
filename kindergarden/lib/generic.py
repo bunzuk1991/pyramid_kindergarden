@@ -199,7 +199,6 @@ class GenericView(object):
 
     def create(self):
         form = self.form(model=self.model, request=self.request.POST or None)
-        csrf = get_csrf_token(self.request)
         try:
             if form.validate() and self.request.method == "POST":
                 obj = self.model()

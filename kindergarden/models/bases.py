@@ -38,8 +38,8 @@ from sqlalchemy.exc import IntegrityError
 Session = sessionmaker()
 
 # later, we create the engine
-engine = create_engine('postgresql+psycopg2://postgres:kat221008@127.0.0.1:5432/garden')
 
+engine = create_engine('postgresql+psycopg2://postgres:kat221008@127.0.0.1:5432/garden')
 # associate it with our custom Session class
 Session.configure(bind=engine)
 

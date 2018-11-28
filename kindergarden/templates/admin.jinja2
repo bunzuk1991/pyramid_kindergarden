@@ -10,15 +10,30 @@
 <body>
 
     {% if action == "new" %}
-        <form action="{{ request.route_url(request.matched_route.name, _query={'action':'create'}) }}" method="post">
-        {{ request.dbsession.get_csrf_token() }}
+        <form action="{{ request.route_url(request.matched_route.name.replace("_crud", "_create")) }}" method="post">
+{#        {{ request.dbsession.get_csrf_token() }}#}
         {{ form.errors }}
             {% for field in form %}
                 <p><span>{{ field.label }}</span> <span>{{ field }}</span></p>
             {% endfor %}
-         <button name="action" value="create" type="submit">
-            <span class="button-content">СТВОРИТИ</span>
-        </button>
+{#         <button name="action" value="create" type="submit">#}
+{#            <span class="button-content">СТВОРИТИ</span>#}
+{#        </button>#}
+            <input type="submit" value="SAVE">
+        </form>
+    {% endif %}
+
+    {% if action == "create" %}
+        <form action="{{ request.route_url(request.matched_route.name, _query={'action':'create'}) }}" method="post">
+{#        {{ request.dbsession.get_csrf_token() }}#}
+        {{ form.errors }}
+            {% for field in form %}
+                <p><span>{{ field.label }}</span> <span>{{ field }}</span></p>
+            {% endfor %}
+{#         <button name="action" value="create" type="submit">#}
+{#            <span class="button-content">СТВОРИТИ</span>#}
+{#        </button>#}
+            <input type="submit" value="SAVE">
         </form>
     {% endif %}
 
