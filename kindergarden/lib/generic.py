@@ -5,6 +5,7 @@ from datetime import date, datetime
 
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.renderers import render, render_to_response
+from pyramid.csrf import get_csrf_token
 
 strip_filter = lambda x: x.strip() if x else None
 
@@ -14,7 +15,7 @@ from kindergarden.models.bases import session
 from kindergarden.models.meta import Base
 from wtforms import validators
 from wtforms import widgets
-from wtforms import Form as WTF_form
+from wtforms import Form
 from wtforms import (
     StringField,
     BooleanField,
@@ -59,6 +60,88 @@ def xhr_template(name, context, options=None, request=None):
 
     return render_to_response('json', {'template': template}, request=request, response=request.response)
 
+# generic form
+class GenericForm(Form):
+    model = None
+
+    def __init__(self, model=None, request=None, fields_exclude=None, default_=None, min_=None, max_=None, **kwargs):
+        self.request = request
+        if model:
+            self.model = model
+        if self.model:
+            for column in self.model.__table__.columns:
+                column_name = column.name
+                column_nullable = column.nullable
+                column_primary_key = column.primary_key
+                column_relations = column.foreign_keys
+                column_relation_class = None
+                column_relation_table_name = None
+                current_field_type = column.type.__visit_name__
+                column_default = None
+                column_min = None
+                column_max = None
+                column_filter = None
+
+                if column_relations.__len__() > 0:
+                    for a in column_relations:
+                        col_tokens  = a._column_tokens
+                        column_relation_table_name = col_tokens[1]
+                        column_relation_class = get_class_from_table_name(column_relation_table_name)
+
+                if column_relation_class:
+                    current_field_type = 'select'
+
+                if default_:
+                    column_default = default_
+                if min:
+                    column_min = min_
+                if max:
+                    column_max = max_
+
+                if current_field_type == 'integer':
+                    if not column_default and not column_primary_key:
+                        column_default = 0
+                elif current_field_type == 'unicode_text':
+                    column_filter = strip_filter
+                    # if not column_default:
+                    #     column_default = ""
+                elif current_field_type == 'string':
+                    column_filter = strip_filter
+                    # if not column_default:
+                    #     column_default = ""
+                elif current_field_type == 'text':
+                    column_filter = strip_filter
+                    # if not column_default:
+                    #     column_default = ""
+                elif current_field_type == 'boolean':
+                    if not column_default:
+                        column_default = False
+                elif current_field_type == 'datetime':
+                    if not column_min and not column_max:
+                        column_min = 1900
+                elif current_field_type == 'date':
+                    if not column_min and not column_max:
+                        column_min = 1900
+                elif current_field_type == 'decimal':
+                    pass
+                    # if not column_default:
+                    #     column_default = 0
+
+                field = construct_colum_for_column_type(
+                    current_field_type,
+                    column_name,
+                    not column_nullable,
+                    column_default=column_default,
+                    column_max=column_max,
+                    column_min=column_min,
+                    filter_=column_filter,
+                    rel_class=column_relation_class,
+                    primary=column_primary_key
+                )
+                setattr(self, column_name, field)
+                self._unbound_fields = self._unbound_fields + [[column_name, field]]
+        super(GenericForm, self).__init__(**kwargs)
+
 
 class GenericView(object):
     model = None
@@ -76,6 +159,7 @@ class GenericView(object):
         self.db = DBSession
         self.context = {}
         self.settings = self.request.registry.settings
+
 
     def list(self):
         if not self.query:
@@ -95,7 +179,9 @@ class GenericView(object):
             return HTTPFound(location=self.request.route_url('%s_list' % self.verbose_name))
 
         self.context.update({'objects': objects})
-        return render_to_response('%s:templates/model/%s/list.mako' % (APP_NAME, self.verbose_name), self.context,
+        self.context.update({'fields': get_columns_from_model(self.model)})
+        self.context.update({'action': 'list'})
+        return render_to_response('%s:templates/admin.jinja2' % APP_NAME, self.context,
                                   request=self.request)
 
     def crud(self):
@@ -105,16 +191,17 @@ class GenericView(object):
             return HTTPNotFound()
 
     def new(self):
-        form = self.form()
+        form = self.form(model=self.model)
         self.context.update({'form': form})
-        return render_to_response('%s:templates/model/%s/create.mako' % (APP_NAME, self.verbose_name), self.context,
+        self.context.update({'action': 'new'})
+        return render_to_response('%s:templates/admin.jinja2' % APP_NAME, self.context,
                                   request=self.request)
 
     def create(self):
-        form = self.form(self.request.POST)
-
+        form = self.form(model=self.model, request=self.request.POST or None)
+        csrf = get_csrf_token(self.request)
         try:
-            if form.validate():
+            if form.validate() and self.request.method == "POST":
                 obj = self.model()
                 if hasattr(form, 'process_obj'):
                     form.process_obj(obj)
@@ -127,17 +214,18 @@ class GenericView(object):
                     return xhr_form_errors(form.errors, self.request)
 
                 self.context.update({'form': form})
-                return render_to_response('%s:templates/model/%s/create.mako' % (APP_NAME, self.verbose_name),
+                self.context.update({'action': 'create'})
+                return render_to_response('%s:templates/admin.jinja2' % APP_NAME,
                                           self.context, request=self.request)
         except Exception as e:
-            flash_msg = _('Помилка. Неможливо створити елемент.') % self.verbose_name_i18n
+            flash_msg = _('Помилка. Неможливо створити елемент. %s') % self.verbose_name_i18n
 
             if self.request.is_xhr:
                 return xhr_flash_errors([flash_msg], self.request)
 
             self.context.update({'form': form})
             self.request.session.flash(flash_msg)
-            return render_to_response('%s:templates/model/%s/create.mako' % (APP_NAME, self.verbose_name), self.context,
+            return render_to_response('%s:templates/admin.jinja2' % APP_NAME, self.context,
                                       request=self.request)
 
         flash_msg = _('%s успішно створено.') % self.verbose_name_i18n.capitalize()
@@ -322,23 +410,21 @@ def construct_colum_for_column_type(type_name,
                 lenght_validator = validators.number_range(min=date(column_min, 1, 1))
             else:
                 lenght_validator = validators.number_range(max=date(column_max, 12, 31))
+            validators_.append(lenght_validator)
 
     data = {
-        'integer': IntegerField(column_name),
-        'unicode_text': StringField(column_name),
-        'text': StringField(column_name),
-        'string': StringField(column_name),
-        'decimal': IntegerField(column_name),
-        'boolean': BooleanField(column_name),
-        'datetime': DateTimeField(column_name),
-        'select': SelectFieldBase(column_name, coerce=int)
+        'integer': IntegerField(column_name, validators_, default=column_default),
+        'unicode_text': StringField(column_name, validators_, default=column_default),
+        'text': StringField(column_name, validators_, default=column_default),
+        'string': StringField(column_name, validators_, default=column_default),
+        'decimal': IntegerField(column_name, validators_, default=column_default),
+        'boolean': BooleanField(column_name, validators_, default=column_default),
+        'datetime': DateTimeField(column_name, validators_, default=column_default),
+        'select': SelectFieldBase(column_name, validators_, coerce=int)
     }
 
     if type_name in data:
         current_column = data[type_name]
-        current_column.validators = validators_
-        if column_default:
-            current_column.default = column_default
         if widget:
             current_column.widget = widget
         if filter_:
@@ -353,83 +439,10 @@ def construct_colum_for_column_type(type_name,
     return current_column
 
 
-# generic form
-class GenericForm(WTF_form):
-    model = None
 
-    def __init__(self, model, fields_exclude = None, default_=None, min_=None, max_=None):
-        if model:
-            self.model = model
-        if self.model:
-            for column in self.model.__table__.columns:
-                column_name = column.name
-                column_nullable = column.nullable
-                column_primary_key = column.primary_key
-                column_relations = column.foreign_keys
-                column_relation_class = None
-                column_relation_table_name = None
-                current_field_type = column.type.__visit_name__
-                column_default = None
-                column_min = None
-                column_max = None
-                column_filter = None
-
-                if column_relations.__len__() > 0:
-                    for a in column_relations:
-                        col_tokens  = a._column_tokens
-                        column_relation_table_name = col_tokens[1]
-                        column_relation_class = get_class_from_table_name(column_relation_table_name)
-
-                if column_relation_class:
-                    current_field_type = 'select'
-
-                if default_:
-                    column_default = default_
-                if min:
-                    column_min = min_
-                if max:
-                    column_max = max_
-
-                if current_field_type == 'integer':
-                    if not column_default:
-                        column_default = 0
-                elif current_field_type == 'unicode_text':
-                    column_filter = strip_filter
-                    if not column_default:
-                        column_default = ""
-                elif current_field_type == 'string':
-                    column_filter = strip_filter
-                    if not column_default:
-                        column_default = ""
-                elif current_field_type == 'text':
-                    column_filter = strip_filter
-                    if not column_default:
-                        column_default = ""
-                elif current_field_type == 'boolean':
-                    if not column_default:
-                        column_default = False
-                elif current_field_type == 'datetime':
-                    if not column_min and not column_max:
-                        column_min = 1900
-                elif current_field_type == 'date':
-                    if not column_min and not column_max:
-                        column_min = 1900
-                elif current_field_type == 'decimal':
-                    if not column_default:
-                        column_default = 0
-
-                self.__setattr__(column_name, construct_colum_for_column_type(
-                    current_field_type,
-                    column_name,
-                    not column_nullable,
-                    column_default=column_default,
-                    column_max=column_max,
-                    column_min=column_min,
-                    filter_=column_filter,
-                    rel_class=column_relation_class,
-                    primary=column_primary_key
-                ))
-
+def get_columns_from_model(model):
+    fields = [column.name for column in model.__table__.columns]
+    return fields
 
 def apply_sorting_query(query, request, config, sort_exp='sort_exp', default_exp=None):
     if not default_exp:
