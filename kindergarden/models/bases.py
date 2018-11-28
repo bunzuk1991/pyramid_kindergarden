@@ -35,16 +35,16 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
 
 # configure Session class with desired options
-Session = sessionmaker()
+# Session = sessionmaker()
 
 # later, we create the engine
 
-engine = create_engine('postgresql+psycopg2://postgres:kat221008@127.0.0.1:5432/garden')
+# engine = create_engine('postgresql+psycopg2://postgres:kat221008@127.0.0.1:5432/garden')
 # associate it with our custom Session class
-Session.configure(bind=engine)
+# Session.configure(bind=engine)
 
 # work with the session
-session = Session()
+# session = Session()
 
 DATEFORMAT = "%d.%m.%Y"
 
@@ -106,6 +106,7 @@ class GardenGroup(Base):
 
 class Group(Base):
     __tablename__ = 'group'
+
     id = Column(Integer, primary_key=True)
     gardengroup_id = Column(Integer, ForeignKey('gardengroup.id'), nullable=False)
     name = Column(UnicodeText, nullable=False, default="")

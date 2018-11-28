@@ -36,3 +36,4 @@ def includeme(config):
     config.add_route('home', '/')
     add_crud_routes(config, 'organisation')
     add_crud_views(config, 'kindergarden.views.admin.organisation.Organisation', 'organisation')
+    config.include('kindergarden.models')

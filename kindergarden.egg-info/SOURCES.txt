@@ -32,7 +32,9 @@ kindergarden/static/pyramid-16x16.png
 kindergarden/static/pyramid.png
 kindergarden/static/theme.css
 kindergarden/templates/404.jinja2
-kindergarden/templates/admin.jinja2
+kindergarden/templates/admin_create.jinja2
+kindergarden/templates/admin_list.jinja2
+kindergarden/templates/admin_update.jinja2
 kindergarden/templates/layout.jinja2
 kindergarden/templates/mytemplate.jinja2
 kindergarden/views/__init__.py

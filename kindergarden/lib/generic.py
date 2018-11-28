@@ -7,11 +7,13 @@ from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.renderers import render, render_to_response
 from pyramid.csrf import get_csrf_token
 
+
+
 strip_filter = lambda x: x.strip() if x else None
 
 from kindergarden.lib import helpers as h
 from kindergarden.lib.i18n import ugettext as _
-from kindergarden.models.bases import session
+from kindergarden.models.bases import *
 from kindergarden.models.meta import Base
 from wtforms import validators
 from wtforms import widgets
@@ -32,7 +34,7 @@ from wtforms import (
 )
 
 
-DBSession = session
+# DBSession = session
 APP_NAME = 'kindergarden'
 
 log = logging.getLogger(__name__)
@@ -140,7 +142,7 @@ class GenericForm(Form):
                 )
                 setattr(self, column_name, field)
                 self._unbound_fields = self._unbound_fields + [[column_name, field]]
-        super(GenericForm, self).__init__(**kwargs)
+        super(GenericForm, self).__init__(self.request)
 
 
 class GenericView(object):
@@ -156,7 +158,7 @@ class GenericView(object):
 
     def __init__(self, request):
         self.request = request
-        self.db = DBSession
+        self.db = self.request.dbsession
         self.context = {}
         self.settings = self.request.registry.settings
 
@@ -180,8 +182,7 @@ class GenericView(object):
 
         self.context.update({'objects': objects})
         self.context.update({'fields': get_columns_from_model(self.model)})
-        self.context.update({'action': 'list'})
-        return render_to_response('%s:templates/admin.jinja2' % APP_NAME, self.context,
+        return render_to_response('%s:templates/admin_list.jinja2' % APP_NAME, self.context,
                                   request=self.request)
 
     def crud(self):
@@ -193,8 +194,7 @@ class GenericView(object):
     def new(self):
         form = self.form(model=self.model)
         self.context.update({'form': form})
-        self.context.update({'action': 'new'})
-        return render_to_response('%s:templates/admin.jinja2' % APP_NAME, self.context,
+        return render_to_response('%s:templates/admin_create.jinja2' % APP_NAME, self.context,
                                   request=self.request)
 
     def create(self):
@@ -213,8 +213,7 @@ class GenericView(object):
                     return xhr_form_errors(form.errors, self.request)
 
                 self.context.update({'form': form})
-                self.context.update({'action': 'create'})
-                return render_to_response('%s:templates/admin.jinja2' % APP_NAME,
+                return render_to_response('%s:templates/admin_create.jinja2' % APP_NAME,
                                           self.context, request=self.request)
         except Exception as e:
             flash_msg = _('Помилка. Неможливо створити елемент. %s') % self.verbose_name_i18n
@@ -224,7 +223,7 @@ class GenericView(object):
 
             self.context.update({'form': form})
             self.request.session.flash(flash_msg)
-            return render_to_response('%s:templates/admin.jinja2' % APP_NAME, self.context,
+            return render_to_response('%s:templates/admin_create.jinja2' % APP_NAME, self.context,
                                       request=self.request)
 
         flash_msg = _('%s успішно створено.') % self.verbose_name_i18n.capitalize()
