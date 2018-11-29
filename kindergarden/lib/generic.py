@@ -14,7 +14,6 @@ strip_filter = lambda x: x.strip() if x else None
 from kindergarden.lib import helpers as h
 from kindergarden.lib.i18n import ugettext as _
 from kindergarden.models.bases import *
-from kindergarden.models.meta import Base
 from wtforms import validators
 from wtforms import widgets
 from wtforms import Form
@@ -66,7 +65,7 @@ def xhr_template(name, context, options=None, request=None):
 class GenericForm(Form):
     model = None
 
-    def __init__(self, model=None, request=None, fields_exclude=None, default_=None, min_=None, max_=None, **kwargs):
+    def __init__(self, model=None, request=None, fields_exclude=None, **kwargs):
         self.request = request
         if model:
             self.model = model
@@ -79,7 +78,7 @@ class GenericForm(Form):
                 column_relation_class = None
                 column_relation_table_name = None
                 current_field_type = column.type.__visit_name__
-                column_default = None
+                column_default = column.default if column.default else None
                 column_min = None
                 column_max = None
                 column_filter = None
@@ -89,45 +88,6 @@ class GenericForm(Form):
                         col_tokens  = a._column_tokens
                         column_relation_table_name = col_tokens[1]
                         column_relation_class = get_class_from_table_name(column_relation_table_name)
-
-                if column_relation_class:
-                    current_field_type = 'select'
-
-                if default_:
-                    column_default = default_
-                if min:
-                    column_min = min_
-                if max:
-                    column_max = max_
-
-                if current_field_type == 'integer':
-                    if not column_default and not column_primary_key:
-                        column_default = 0
-                elif current_field_type == 'unicode_text':
-                    column_filter = strip_filter
-                    # if not column_default:
-                    #     column_default = ""
-                elif current_field_type == 'string':
-                    column_filter = strip_filter
-                    # if not column_default:
-                    #     column_default = ""
-                elif current_field_type == 'text':
-                    column_filter = strip_filter
-                    # if not column_default:
-                    #     column_default = ""
-                elif current_field_type == 'boolean':
-                    if not column_default:
-                        column_default = False
-                elif current_field_type == 'datetime':
-                    if not column_min and not column_max:
-                        column_min = 1900
-                elif current_field_type == 'date':
-                    if not column_min and not column_max:
-                        column_min = 1900
-                elif current_field_type == 'decimal':
-                    pass
-                    # if not column_default:
-                    #     column_default = 0
 
                 field = construct_colum_for_column_type(
                     current_field_type,
@@ -386,7 +346,7 @@ def construct_colum_for_column_type(type_name,
 
     validators_ = []
 
-    if required:
+    if required and not primary and not column_default:
         validators_.append(validators.data_required())
     else:
         validators_.append(validators.optional())
@@ -403,11 +363,24 @@ def construct_colum_for_column_type(type_name,
     else:
         if column_min or column_max:
             if column_min and column_max:
-                lenght_validator = validators.number_range(min=date(column_min, 1, 1), max=date(column_max, 12, 31))
+                lenght_validator = validators.number_range(
+                    min=date(column_min, 1, 1) if type_name == "date" else datetime.datetime(column_min, 1, 1, 1, 1, 1),
+                    max=date(column_max, 12, 31) if type_name == "date" else datetime.datetime(column_min, 12, 31, 23, 59, 59)
+                )
             elif column_min and not column_max:
-                lenght_validator = validators.number_range(min=date(column_min, 1, 1))
+                lenght_validator = validators.number_range(
+                    min=date(column_min, 1, 1) if type_name == "date" else datetime.datetime(column_min, 1, 1, 1, 1, 1)
+                )
             else:
-                lenght_validator = validators.number_range(max=date(column_max, 12, 31))
+                lenght_validator = validators.number_range(
+                    max=date(column_max, 12, 31) if type_name == "date" else datetime.datetime(column_min, 12, 31,
+                                                                                               23, 59, 59)
+                )
+            validators_.append(lenght_validator)
+        else:
+            lenght_validator = validators.number_range(
+                min=date(1920, 1, 1) if type_name == "date" else datetime.datetime(1920, 1, 1, 1, 1, 1)
+            )
             validators_.append(lenght_validator)
 
     data = {
@@ -424,13 +397,15 @@ def construct_colum_for_column_type(type_name,
     if type_name in data:
         current_column = data[type_name]
         if widget:
-            current_column.widget = widget
+            current_column.field_class.widget = widget
         if filter_:
             current_column.filters = [filter_]
         if primary:
-            current_column.widget = widgets.HiddenInput()
+            current_column.field_class.widget = widgets.HiddenInput()
         if rel_class:
             current_column.choices = [(g.id, g.name) for g in rel_class.query.order_by('id')]
+        if required:
+            current_column.render_kw = current_column.render_kw + {"class": 'req-field'}
     else:
         current_column = None
 

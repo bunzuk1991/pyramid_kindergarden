@@ -5,7 +5,7 @@ import zope.sqlalchemy
 
 # import or define all models here to ensure they are attached to the
 # Base.metadata prior to any initialization routines
-from .bases import *
+from kindergarden.models.bases import Organisation, Group, GardenGroup, User
 
 # run configure_mappers after defining all of the models to ensure
 # all relationships can be setup
@@ -46,7 +46,6 @@ def get_tm_session(session_factory, transaction_manager):
     dbsession = session_factory()
     zope.sqlalchemy.register(
         dbsession, transaction_manager=transaction_manager)
-
     return dbsession
 
 
@@ -54,10 +53,9 @@ def includeme(config):
     """
     Initialize the model for a Pyramid app.
 
-    Activate this setup using ``config.include('kindergarden.models')``.
+    Activate this setup using ``config.include('pyramid_blogr.models')``.
 
     """
-    config.include('kindergarden.models')
     settings = config.get_settings()
     settings['tm.manager_hook'] = 'pyramid_tm.explicit_manager'
 
@@ -74,5 +72,3 @@ def includeme(config):
         'dbsession',
         reify=True
     )
-
-

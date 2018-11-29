@@ -14,7 +14,12 @@
         {{ form.errors }}
     {% endif %}
         {% for field in form %}
-            <p><span>{{ field.label }}</span> <span>{{ field }}</span></p>
+            <p>
+                {% if field.widget.input_type != 'hidden' %}
+                    <span>{{ field.label }}</span>
+                {% endif %}
+                <span>{{ field }}</span>
+            </p>
         {% endfor %}
         <input name="action" type="submit" value="create">
     </form>

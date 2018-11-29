@@ -22,15 +22,22 @@ from sqlalchemy import (
 )
 
 from .meta import Base
+from zope.sqlalchemy import ZopeTransactionExtension
 import datetime
 from ..services import others
 
 from sqlalchemy.orm import (
     sessionmaker,
     relationship,
-    backref
+    backref,
+    scoped_session
 )
 from sqlalchemy import create_engine
+
+
+DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
+
+
 
 from sqlalchemy.exc import IntegrityError
 
@@ -65,22 +72,22 @@ class Organisation(Base):
     address = Column(UnicodeText, nullable=True)
     kod_zkpo = Column(Text, nullable=True)
     kod_ipn = Column(Text, nullable=True)
-    disabled = Column(Boolean, server_default=text('FALSE'), nullable=False)
+    disabled = Column(Boolean, default=False, nullable=False)
     slug = Column(Text, nullable=True, unique=True)
     create_date = Column(DateTime, default=datetime.datetime.utcnow)
     update_date = Column(DateTime, nullable=True)
 
-    def save(self):
-        if not self.slug:
-            if self.name:
-                self.slug = others.get_new_slug(self, 'name', self.name, session)
-                print(self.slug)
-
-        session.add(self)
-        try:
-            session.commit()
-        except Exception:
-            session.close()
+    # def save(self):
+    #     if not self.slug:
+    #         if self.name:
+    #             self.slug = others.get_new_slug(self, 'name', self.name, session)
+    #             print(self.slug)
+    #
+    #         DBSession.add(self)
+    #     try:
+    #         DBSession.commit()
+    #     except Exception:
+    #         DBSession.close()
 
     def __str__(self):
         return '%s (%s)' % (self.name, self.create_date.strftime(DATEFORMAT))
