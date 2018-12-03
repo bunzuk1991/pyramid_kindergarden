@@ -65,6 +65,14 @@ def xhr_template(name, context, options=None, request=None):
 class GenericForm(Form):
     model = None
 
+    @staticmethod
+    def is_hidden(field):
+        if isinstance(field, HiddenField):
+            return True
+        if isinstance(field.widget, widgets.HiddenInput):
+            return True
+        return False
+
     def __init__(self, model=None, request=None, fields_exclude=None, **kwargs):
         self.request = request
         if model:
@@ -109,7 +117,8 @@ class GenericForm(Form):
                 )
                 setattr(self, column_name, field)
                 self._unbound_fields = self._unbound_fields + [[column_name, field]]
-        super(GenericForm, self).__init__(self.request)
+        super(GenericForm, self).__init__(self.request, **kwargs)
+
 
 
 class GenericView(object):
@@ -128,7 +137,6 @@ class GenericView(object):
         self.db = self.request.dbsession
         self.context = {}
         self.settings = self.request.registry.settings
-
 
     def list(self):
         if not self.query:
@@ -162,6 +170,7 @@ class GenericView(object):
     def new(self):
         form = self.form(model=self.model)
         self.context.update({'form': form})
+        self.context.update({'my_model': self.model.__name__.lower()})
         return render_to_response('%s:templates/admin_create.mako' % APP_NAME, self.context,
                                   request=self.request)
 
@@ -181,6 +190,7 @@ class GenericView(object):
                     return xhr_form_errors(form.errors, self.request)
 
                 self.context.update({'form': form})
+                self.context.update({'my_model': self.model.__name__.lower()})
                 return render_to_response('%s:templates/admin_create.mako' % APP_NAME,
                                           self.context, request=self.request)
         except Exception as e:
@@ -190,6 +200,7 @@ class GenericView(object):
                 return xhr_flash_errors([flash_msg], self.request)
 
             self.context.update({'form': form})
+            self.context.update({'my_model': self.model.__name__.lower()})
             self.request.session.flash(flash_msg)
             return render_to_response('%s:templates/admin_create.mako' % APP_NAME, self.context,
                                       request=self.request)
@@ -210,19 +221,20 @@ class GenericView(object):
 
         obj = self.db.query(self.model).filter_by(id=id).first()
         if obj:
-            form = self.form(obj=obj)
+            form = self.form(model=self.model, obj=obj)
         else:
             self.request.session.flash(_('Помилка. Не вибраний жоден з елементів.'))
             return HTTPFound(location=self.request.route_url('%s_list' % self.verbose_name))
 
         self.context.update({'form': form, 'id': id})
-        return render_to_response('%s:templates/model/%s/update.mako' % (APP_NAME, self.verbose_name), self.context,
+        self.context.update({'my_model': self.model.__name__.lower()})
+        return render_to_response('%s:templates/admin_update.mako' % APP_NAME, self.context,
                                   request=self.request)
 
     def update(self):
         id = self.request.matchdict.get('id')
 
-        form = self.form(self.request.POST)
+        form = self.form(model=self.model, request=self.request.POST or None)
         try:
             if form.validate():
                 obj = self.db.query(self.model).filter_by(id=id).first()
@@ -237,8 +249,9 @@ class GenericView(object):
                     return xhr_form_errors(form.errors, self.request)
 
                 self.context.update({'form': form, 'id': id})
-                return render_to_response('%s:templates/model/%s/update.mako' % (APP_NAME, self.verbose_name),
-                                          self.context, request=self.request)
+                self.context.update({'my_model': self.model.__name__.lower()})
+                return render_to_response('%s:templates/admin_update.mako' % APP_NAME, self.context,
+                                          request=self.request)
         except:
             flash_msg = _('Помилка. Неможливо оновити елемент.')
 
@@ -246,8 +259,9 @@ class GenericView(object):
                 return xhr_flash_errors([flash_msg], self.request)
 
             self.context.update({'form': form, 'id': id})
+            self.context.update({'my_model': self.model.__name__.lower()})
             self.request.session.flash(flash_msg)
-            return render_to_response('%s:templates/model/%s/update.mako' % (APP_NAME, self.verbose_name), self.context,
+            return render_to_response('%s:templates/admin_update.mako' % APP_NAME, self.context,
                                       request=self.request)
 
         flash_msg = _('Елемент успішно оновлений.')
@@ -304,7 +318,8 @@ class GenericView(object):
 
         if obj:
             self.context.update({'object': obj})
-            return render_to_response('%s:templates/model/%s/view.mako' % (APP_NAME, self.verbose_name), self.context,
+            self.context.update({'my_model': self.model.__name__.lower()})
+            return render_to_response('%s:templates/admin_view.mako' % APP_NAME, self.context,
                                       request=self.request)
         else:
             self.request.session.flash(_('Помилка при перегляді елементу.') % self.verbose_name_i18n)
@@ -331,7 +346,6 @@ class GenericView(object):
 
     def after_delete(self):
         pass
-
 
 
 def get_class_from_table_name(table_name):
@@ -391,6 +405,10 @@ def construct_colum_for_column_type(type_name,
             )
             validators_.append(lenght_validator)
 
+    choices = []
+    if rel_class:
+        choices = [(g.id, g.name) for g in session_db.query(rel_class).order_by('id')]
+
     data = {
         'integer': IntegerField(column_name, validators_, default=column_default),
         'unicode_text': StringField(column_name, validators_, default=column_default),
@@ -399,7 +417,8 @@ def construct_colum_for_column_type(type_name,
         'decimal': IntegerField(column_name, validators_, default=column_default),
         'boolean': BooleanField(column_name, validators_, default=column_default),
         'datetime': DateTimeField(column_name, validators_, default=column_default),
-        'select': SelectField(column_name, validators_, coerce=int)
+        'date': DateField(column_name, validators_, default=column_default),
+        'select': SelectField(column_name, validators_, coerce=int, choices=choices)
     }
 
     if type_name in data:
@@ -413,8 +432,8 @@ def construct_colum_for_column_type(type_name,
             current_column.filters = [filter_]
         if primary:
             current_column.field_class.widget = widgets.HiddenInput()
-        if rel_class:
-            current_column.choices = [(g.id, g.name) for g in session_db.query(rel_class).order_by('id')]
+        # if rel_class:
+        #     current_column.choices = [(g.id, g.name) for g in session_db.query(rel_class).order_by('id')]
         # if required:
         #     current_column.render_kw = current_column.render_kw + {"class": 'req-field'}
     else:

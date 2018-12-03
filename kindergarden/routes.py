@@ -1,3 +1,6 @@
+from kindergarden.views.admin.organisation import AdminList
+
+
 def add_crud_routes(config, route_name, route_prefix='/admin', attrs=None, attrs_except=None):
     routes = [
         ('new', '%s/%s/new', 'GET'),
@@ -34,11 +37,24 @@ def add_crud_views(config, view, route_name, attrs=None, attrs_except=None, perm
 def includeme(config):
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_route('home', '/')
+    config.add_route('admin', '/admin', request_method='GET')
+    config.add_view('kindergarden.views.admin.organisation.admin', route_name='admin',
+                    renderer='kindergarden:templates/admin.mako')
 
-    add_crud_routes(config, 'organisation')
-    add_crud_views(config, 'kindergarden.views.admin.organisation.Organisation', 'organisation')
+    AdminList.register_site('organisation')
+    AdminList.register_site('gardengroup')
+    AdminList.register_site('group')
 
-    add_crud_routes(config, 'group')
-    add_crud_views(config, 'kindergarden.views.admin.organisation.Group', 'group')
+    my_routes = AdminList.get_views()
+
+    for a in my_routes:
+        add_crud_routes(config, a['route_name'])
+        add_crud_views(config, a['view_class'], a['route_name'])
+    #
+    # add_crud_routes(config, 'gardengroup')
+    # add_crud_views(config, 'kindergarden.views.admin.organisation.GardenGroup', 'gardengroup')
+    #
+    # add_crud_routes(config, 'group')
+    # add_crud_views(config, 'kindergarden.views.admin.organisation.Group', 'group')
 
     config.include('kindergarden.models')
