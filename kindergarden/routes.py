@@ -34,6 +34,11 @@ def add_crud_views(config, view, route_name, attrs=None, attrs_except=None, perm
 def includeme(config):
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_route('home', '/')
+
     add_crud_routes(config, 'organisation')
     add_crud_views(config, 'kindergarden.views.admin.organisation.Organisation', 'organisation')
+
+    add_crud_routes(config, 'group')
+    add_crud_views(config, 'kindergarden.views.admin.organisation.Group', 'group')
+
     config.include('kindergarden.models')

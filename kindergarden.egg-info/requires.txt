@@ -1,7 +1,7 @@
 pyramid
-pyramid_jinja2
 pyramid_debugtoolbar
 pyramid_tm
+pyramid_mako
 SQLAlchemy
 transaction
 zope.sqlalchemy
@@ -15,6 +15,7 @@ wtforms
 markdown2
 pytils
 paginate
+pillow
 paginate_sqlalchemy
 
 [testing]

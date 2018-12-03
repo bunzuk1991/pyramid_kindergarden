@@ -1,7 +1,8 @@
 from pyramid.config import Configurator
 from sqlalchemy import event, engine_from_config
-from kindergarden.models.bases import DBSession, Base
 from pyramid.session import SignedCookieSessionFactory
+from kindergarden.lib.subscribers import add_renderer_globals, add_localizer
+from pyramid.events import NewRequest, BeforeRender
 
 
 def main(global_config, **settings):
@@ -12,8 +13,10 @@ def main(global_config, **settings):
     # DBSession.configure(bind=engine)
     # Base.metadata.bind = engine
     config = Configurator(settings=settings)
+    config.add_subscriber(add_renderer_globals, BeforeRender)
+    config.add_subscriber(add_localizer, NewRequest)
     config.set_session_factory(my_session_factory)
-    config.include('pyramid_jinja2')
+    config.include('pyramid_mako')
     config.include('kindergarden.models')
     config.include('kindergarden.routes')
     config.scan()

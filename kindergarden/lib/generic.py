@@ -29,7 +29,7 @@ from wtforms import (
     IntegerField,
     DecimalField,
     HiddenField,
-    SelectFieldBase
+    SelectField,
 )
 
 
@@ -78,10 +78,17 @@ class GenericForm(Form):
                 column_relation_class = None
                 column_relation_table_name = None
                 current_field_type = column.type.__visit_name__
-                column_default = column.default if column.default else None
+                column_default = None
                 column_min = None
                 column_max = None
                 column_filter = None
+
+                default = getattr(column, 'default', None)
+
+                if default is not None:
+                    callable_default = getattr(default, 'arg', None)
+                    if callable_default is not None:
+                        column_default = callable_default(None) if callable(callable_default) else callable_default
 
                 if column_relations.__len__() > 0:
                     for a in column_relations:
@@ -116,7 +123,7 @@ class GenericView(object):
     verbose_name_i18n = verbose_name
     verbose_name_plural_i18n = verbose_name_plural
 
-    def __init__(self, request):
+    def __init__(self, request, **kwargs):
         self.request = request
         self.db = self.request.dbsession
         self.context = {}
@@ -142,7 +149,8 @@ class GenericView(object):
 
         self.context.update({'objects': objects})
         self.context.update({'fields': get_columns_from_model(self.model)})
-        return render_to_response('%s:templates/admin_list.jinja2' % APP_NAME, self.context,
+        self.context.update({'my_model': self.model.__name__.lower()})
+        return render_to_response('%s:templates/admin_list.mako' % APP_NAME, self.context,
                                   request=self.request)
 
     def crud(self):
@@ -154,7 +162,7 @@ class GenericView(object):
     def new(self):
         form = self.form(model=self.model)
         self.context.update({'form': form})
-        return render_to_response('%s:templates/admin_create.jinja2' % APP_NAME, self.context,
+        return render_to_response('%s:templates/admin_create.mako' % APP_NAME, self.context,
                                   request=self.request)
 
     def create(self):
@@ -173,7 +181,7 @@ class GenericView(object):
                     return xhr_form_errors(form.errors, self.request)
 
                 self.context.update({'form': form})
-                return render_to_response('%s:templates/admin_create.jinja2' % APP_NAME,
+                return render_to_response('%s:templates/admin_create.mako' % APP_NAME,
                                           self.context, request=self.request)
         except Exception as e:
             flash_msg = _('Помилка. Неможливо створити елемент. %s') % self.verbose_name_i18n
@@ -183,7 +191,7 @@ class GenericView(object):
 
             self.context.update({'form': form})
             self.request.session.flash(flash_msg)
-            return render_to_response('%s:templates/admin_create.jinja2' % APP_NAME, self.context,
+            return render_to_response('%s:templates/admin_create.mako' % APP_NAME, self.context,
                                       request=self.request)
 
         flash_msg = _('%s успішно створено.') % self.verbose_name_i18n.capitalize()
@@ -346,8 +354,8 @@ def construct_colum_for_column_type(type_name,
 
     validators_ = []
 
-    if required and not primary and not column_default:
-        validators_.append(validators.data_required())
+    if required and not primary:
+        validators_.append(validators.any_of([True, False]) if type_name == 'boolean' else validators.data_required())
     else:
         validators_.append(validators.optional())
 
@@ -391,11 +399,14 @@ def construct_colum_for_column_type(type_name,
         'decimal': IntegerField(column_name, validators_, default=column_default),
         'boolean': BooleanField(column_name, validators_, default=column_default),
         'datetime': DateTimeField(column_name, validators_, default=column_default),
-        'select': SelectFieldBase(column_name, validators_, coerce=int)
+        'select': SelectField(column_name, validators_, coerce=int)
     }
 
     if type_name in data:
-        current_column = data[type_name]
+        if rel_class:
+            current_column = data['select']
+        else:
+            current_column = data[type_name]
         if widget:
             current_column.field_class.widget = widget
         if filter_:
@@ -403,19 +414,19 @@ def construct_colum_for_column_type(type_name,
         if primary:
             current_column.field_class.widget = widgets.HiddenInput()
         if rel_class:
-            current_column.choices = [(g.id, g.name) for g in rel_class.query.order_by('id')]
-        if required:
-            current_column.render_kw = current_column.render_kw + {"class": 'req-field'}
+            current_column.choices = [(g.id, g.name) for g in session_db.query(rel_class).order_by('id')]
+        # if required:
+        #     current_column.render_kw = current_column.render_kw + {"class": 'req-field'}
     else:
         current_column = None
 
     return current_column
 
 
-
 def get_columns_from_model(model):
     fields = [column.name for column in model.__table__.columns]
     return fields
+
 
 def apply_sorting_query(query, request, config, sort_exp='sort_exp', default_exp=None):
     if not default_exp:
