@@ -60,7 +60,7 @@ class GardenGroup(GenericView):
     verbose_name = 'gardengroup'
     verbose_name_plural = 'gardengroups'
     verbose_name_i18n = 'група (статичні)'
-    verbose_name_plural_i18n = '(статичні'
+    verbose_name_plural_i18n = '(статичні)'
 
 
 class AdminView(GenericView):

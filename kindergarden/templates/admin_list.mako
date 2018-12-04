@@ -38,7 +38,7 @@
                                  <td class="table-row-column hidden"></td>
                              % else:
                                  <td class="table-row-column">
-                                     ${obj.__getattribute__(field)}
+                                     ${getattr(obj, field)}
                                  </td>
                              % endif
                          % endfor
