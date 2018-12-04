@@ -7,60 +7,26 @@
     <meta name="description" content="pyramid web application">
     <meta name="author" content="Pylons Project">
     <link rel="shortcut icon" href="${request.static_url('kindergarden:static/pyramid-16x16.png')}">
-
     <title>PyCharm Starter project for the Pyramid Web Framework</title>
-
-    <!-- Bootstrap core CSS -->
-    <link href="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Custom styles for this scaffold -->
-    <link href="${request.static_url('kindergarden:static/theme.css')}" rel="stylesheet">
-
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-      <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-    <![endif]-->
+##     <link href="${request.static_url('kindergarden:static/theme.css')}" rel="stylesheet">
+    <link rel="stylesheet" href="${request.static_url('kindergarden:static/css/admin/style.css')}">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 </head>
 
 <body>
 
-<div class="starter-template">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-2">
-                <img class="logo img-responsive" src="${request.static_url('kindergarden:static/pyramid.png')}"
-                     alt="pyramid web framework">
-            </div>
-            <div class="col-md-10">
-                ${ next.body() }
-            </div>
-        </div>
-        <div class="row">
-            <div class="links">
-                <ul>
-                    <li><i class="glyphicon glyphicon-cog icon-muted"></i><a href="https://github.com/Pylons/pyramid">Github
-                        Project</a></li>
-                    <li><i class="glyphicon glyphicon-globe icon-muted"></i><a
-                            href="https://webchat.freenode.net/?channels=pyramid">IRC Channel</a></li>
-                    <li><i class="glyphicon glyphicon-home icon-muted"></i><a href="http://pylonsproject.org">Pylons
-                        Project</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="row">
-            <div class="copyright">
-                Copyright &copy; Pylons Project
-            </div>
-        </div>
-    </div>
+<div class="content-wrapper">
+    ${next.body()}
 </div>
 
-
-<!-- Bootstrap core JavaScript
-================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
-<script src="//oss.maxcdn.com/libs/jquery/1.10.2/jquery.min.js"></script>
-<script src="//oss.maxcdn.com/libs/twitter-bootstrap/3.0.3/js/bootstrap.min.js"></script>
+<div id="pDebug">
+    <div id="pDebugToolbarHandle">
+        <a title="Show Toolbar" id="pShowToolBarButton" href="http://127.0.0.1:6543/_debug_toolbar/3131353833363936" target="pDebugToolbar">«</a>
+    </div>
+</div>
+<script
+  src="https://code.jquery.com/jquery-3.3.1.js"
+  integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+  crossorigin="anonymous"></script>
 </body>
 </html>

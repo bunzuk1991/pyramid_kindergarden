@@ -19,5 +19,7 @@ def main(global_config, **settings):
     config.include('pyramid_mako')
     config.include('kindergarden.models')
     config.include('kindergarden.routes')
+    # config.add_static_view(name='static', path='kindergarden:static')
+    # config.add_static_view(name='static_admin', path='kindergarden:static/admin')
     config.scan()
     return config.make_wsgi_app()
