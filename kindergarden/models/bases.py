@@ -18,7 +18,9 @@ from sqlalchemy import (
     Time,
     DateTime,
     Boolean,
-    text
+    text,
+    DECIMAL,
+    LargeBinary
 )
 
 from .meta import Base
@@ -80,18 +82,6 @@ class Organisation(Base):
     create_date = Column(DateTime, default=datetime.datetime.utcnow)
     update_date = Column(DateTime, nullable=True)
 
-    # def save(self):
-    #     if not self.slug:
-    #         if self.name:
-    #             self.slug = others.get_new_slug(self, 'name', self.name, session)
-    #             print(self.slug)
-    #
-    #         DBSession.add(self)
-    #     try:
-    #         DBSession.commit()
-    #     except Exception:
-    #         DBSession.close()
-
     def __str__(self):
         return '%s (%s)' % (self.name, self.create_date.strftime(DATEFORMAT))
 
@@ -128,3 +118,24 @@ class Group(Base):
 
     def __str__(self):
         return self.name
+
+
+class Children(Base):
+    id = Column(Integer, primary_key=True)
+    group_id = Column(Integer, ForeignKey('Group.id'), nullable=False)
+    fullname = Column(UnicodeText, nullable=False, default="")
+    date_of_birth = Column(Date, nullable=True)
+    growth = Column(Integer, default=0)
+    weight = Column(Numeric(8, 2), default=0)
+    image = Column(LargeBinary, nullable = True)
+    slug = Column(Text, nullable=True, unique=True)
+    actual = Column(Boolean, default=True, nullable=False)
+    date_start = Column(Date, nullable=True)
+    date_end = Column(Date, nullable=True)
+    address = Column(UnicodeText, nullable=False, default="")
+
+    def __str__(self):
+        return self.fullname
+
+    def get_absolute_image_url(self):
+        return "%s%s" % ('', self.image.url)
