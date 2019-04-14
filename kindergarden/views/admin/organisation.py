@@ -62,6 +62,20 @@ class GardenGroup(GenericView):
     verbose_name_i18n = 'група (статичні)'
     verbose_name_plural_i18n = '(статичні)'
 
+class Children(GenericView):
+    request = None
+
+    def __init__(self, request):
+        super().__init__(request)
+
+    model = Children
+    form = GenericForm
+    verbose_name = 'children'
+    verbose_name_plural = 'childrens'
+    verbose_name_i18n = 'діти (перелік)'
+    verbose_name_plural_i18n = 'дітей (перелік)'
+
+
 
 class AdminView(GenericView):
     request = None

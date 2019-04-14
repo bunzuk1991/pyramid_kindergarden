@@ -1,6 +1,7 @@
 import os
 import sys
 import transaction
+from .start_tables import create_start
 
 from pyramid.paster import (
     get_appsettings,
@@ -38,8 +39,10 @@ def main(argv=sys.argv):
 
     session_factory = get_session_factory(engine)
 
-    with transaction.manager:
-        dbsession = get_tm_session(session_factory, transaction.manager)
+    create_start(session_factory, transaction.manager)
 
-        model = User(name='bunzuk1991', password='kat221008')
-        dbsession.add(model)
+    # with transaction.manager:
+    #     dbsession = get_tm_session(session_factory, transaction.manager)
+    #
+    #     model = User(name='bunzuk1991', password='kat221008')
+    #     dbsession.add(model)

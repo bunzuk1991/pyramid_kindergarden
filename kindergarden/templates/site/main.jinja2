@@ -6,8 +6,8 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-    <link rel="stylesheet" href="${request.static_url('kindergarden:static/css/sitejquery-ui.css')}">
-    <link rel="stylesheet" href="${request.static_url('kindergarden:static/css/site/main.css')}">
+    <link rel="stylesheet" href="{{request.static_url('kindergarden:static/css/sitejquery-ui.css')}}">
+    <link rel="stylesheet" href="{{request.static_url('kindergarden:static/css/site/main.css')}}">
     {% block css %}
     {% endblock css %}
     <title>Main</title>
@@ -119,7 +119,7 @@
                     <div class="aside-content">
                         <ul class="menu-left">
                             <li class="menu-left-item">
-                                <a href="main.html">
+                                <a href="main.jinja2">
                                     <i class="fa fa-dashboard"></i>
                                     <div class="text-title">
                                         <i>Панель інструментів</i>
@@ -127,7 +127,7 @@
                                 </a>
                             </li>
                             <li class="menu-left-item">
-                                <a href="childrens.html">
+                                <a href="childrens.jinja2">
                                     <i class="fa fa-id-card-o"></i>
                                     <div class="text-title">
                                         <i>Діти</i>
@@ -182,7 +182,7 @@
                 <div class="content">
                     {% block content %}
                         <h3>Стартова сторінка</h3>
-                    {% endblock content %}
+                    {% endblock %}
                 </div>
             </div>
         </div>
@@ -197,7 +197,7 @@
   src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
   integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
   crossorigin="anonymous"></script>
-    <script src="${request.static_url('kindergarden:static/js/site/jquery-main.js')}"></script>
-    <script src="${request.static_url('kindergarden:static/js/site/bday-picker.js')}"></script>
+    <script src="{{request.static_url('kindergarden:static/js/site/jquery-main.js')}}"></script>
+    <script src="{{request.static_url('kindergarden:static/js/site/bday-picker.js')}}"></script>
 </body>
 </html>

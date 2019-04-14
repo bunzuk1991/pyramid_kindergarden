@@ -1,9 +1,9 @@
-{% extends 'garden/main.html' %}
-{% load static %}
+{% extends 'kindergarden:templates/site/main.jinja2' %}
 
 {% block css %}
-    <link rel="stylesheet" href="${request.static_url('kindergarden:static/css/site/childrens.css')}">
+    <link rel="stylesheet" href="{{request.static_url('kindergarden:static/css/site/childrens.css')}}">
 {% endblock css %}
+
 {% block content %}
     <div class="content">
         <div class="children-wrapper">
@@ -27,7 +27,7 @@
                         </div>
                     </li>
                     <li class="list-item">
-                        <a href="{% url  'child-create'%}">
+                        <a href="#">
                             <i class="fa fa-list"></i>
                             Додати нову дитину
                         </a>
@@ -67,9 +67,9 @@
                         <li>
                             <div class="cl-img">
                                 {% if elem.child.image %}
-                                    <img src="{{ elem.child.image.url }}" alt="#">
+                                    <img src="#" alt="#">
                                 {% else %}
-                                    <img src="{% static 'img/no-image.png' %}" alt="#">
+                                    <img src="{{request.static_url('kindergarden:static/img/no-image.png')}}" alt="#">
                                 {% endif %}
                             </div>
                             <div class="cl-name">
@@ -77,7 +77,7 @@
                                 <p>{{ elem.child.address }}</p>
                             </div>
                             <div class="cl-birth">
-                                <p>{{ elem.child.date_of_birth|date:"Y-m-d"}}</p>
+                                <p>{{ elem.child.date_of_birth}}</p>
                             </div>
                             <div class="cl-parrents">
                                 <ul>
@@ -91,7 +91,7 @@
                                 </ul>
                             </div>
                             <div class="cl-date-in">
-                                <p>{{ elem.child.date_start|date:"Y-m-d" }}</p>
+                                <p>{{ elem.child.date_start}}</p>
                             </div>
                             <div class="cl-count">
                                 <div class="cl-weight">
@@ -108,4 +108,4 @@
             </div>
         </div>
     </div>
- {% endblock content %}
+ {% endblock %}

@@ -114,15 +114,16 @@ class Group(Base):
     year_out = Column(Date, nullable=True)
     slug = Column(Text, nullable=True, unique=True)
 
-    garden_year_group = relationship('GardenGroup', backref=backref('group', order_by='Group.year_in'))
+    gardengroup = relationship('GardenGroup', backref=backref('group', order_by='Group.name'))
 
     def __str__(self):
         return self.name
 
 
 class Children(Base):
+    __tablename__ = 'children'
     id = Column(Integer, primary_key=True)
-    group_id = Column(Integer, ForeignKey('Group.id'), nullable=False)
+    group_id = Column(Integer, ForeignKey('group.id'), nullable=False)
     fullname = Column(UnicodeText, nullable=False, default="")
     date_of_birth = Column(Date, nullable=True)
     growth = Column(Integer, default=0)
@@ -134,8 +135,39 @@ class Children(Base):
     date_end = Column(Date, nullable=True)
     address = Column(UnicodeText, nullable=False, default="")
 
+    parents = relationship('Parent', backref='child',
+                                lazy='dynamic')
+
     def __str__(self):
         return self.fullname
 
-    def get_absolute_image_url(self):
-        return "%s%s" % ('', self.image.url)
+    # def get_absolute_image_url(self):
+    #     return "%s%s" % ('', self.image.url)
+
+
+class Relation(Base):
+    __tablename__ = 'relation'
+    id = Column(Integer, primary_key=True)
+    name = Column(UnicodeText, nullable=False, default="")
+    actual = Column(Boolean, default=True, nullable=False)
+    slug = Column(Text, nullable=True, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Parent(Base):
+    __tablename__ = 'parent'
+    id = Column(Integer, primary_key=True)
+    child_id = Column(Integer, ForeignKey('children.id'), nullable=False)
+    relation_id = Column(Integer, ForeignKey('relation.id'), nullable=False)
+    fullname = Column(UnicodeText, nullable=False, default="")
+    date_of_birth = Column(Date, nullable=True)
+    phone = Column(UnicodeText, default='')
+    address = Column(UnicodeText, default='')
+    work = Column(UnicodeText, default='')
+    workplace = Column(UnicodeText, default='')
+    with_child = Column(Boolean, default=True, nullable=False)
+
+    def __str__(self):
+        return '%s(%s)' % (self.fullname, self.with_child)
