@@ -66,18 +66,18 @@
                     {% for elem in children_with_parents %}
                         <li>
                             <div class="cl-img">
-                                {% if elem.child.image %}
+                                {% if elem.image %}
                                     <img src="#" alt="#">
                                 {% else %}
                                     <img src="{{request.static_url('kindergarden:static/img/no-image.png')}}" alt="#">
                                 {% endif %}
                             </div>
                             <div class="cl-name">
-                                <p><a href="{{ elem.child.get_absolute_url }}"> {{ elem.child.fullname }}</a></p>
-                                <p>{{ elem.child.address }}</p>
+                                <p><a href="{{ request.route_url('children-view', slug=elem.slug) }}"> {{ elem.fullname }}</a></p>
+                                <p>{{ elem.address }}</p>
                             </div>
                             <div class="cl-birth">
-                                <p>{{ elem.child.date_of_birth}}</p>
+                                <p>{{ elem.date_of_birth}}</p>
                             </div>
                             <div class="cl-parrents">
                                 <ul>
@@ -91,14 +91,14 @@
                                 </ul>
                             </div>
                             <div class="cl-date-in">
-                                <p>{{ elem.child.date_start}}</p>
+                                <p>{{ elem.date_start}}</p>
                             </div>
                             <div class="cl-count">
                                 <div class="cl-weight">
-                                    <span>{{ elem.child.weight }}</span>
+                                    <span>{{ elem.weight }}</span>
                                 </div>
                                 <div class="cl-height">
-                                    <span>{{ elem.child.growth }}</span>
+                                    <span>{{ elem.growth }}</span>
                                 </div>
                             </div>
                         </li>

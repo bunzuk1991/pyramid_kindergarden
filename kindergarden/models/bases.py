@@ -36,7 +36,6 @@ from sqlalchemy.orm import (
 )
 from sqlalchemy import create_engine
 
-
 # DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 
 
@@ -140,6 +139,12 @@ class Children(Base):
 
     def __str__(self):
         return self.fullname
+
+    def get_url(self, request):
+        if request:
+            return request.route_url('children-edt', slug=self.slug)
+        else:
+            return 'request does\'t get'
 
     # def get_absolute_image_url(self):
     #     return "%s%s" % ('', self.image.url)

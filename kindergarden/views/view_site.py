@@ -11,6 +11,6 @@ def dashboard(request):
 @view_config(route_name='childrens', renderer='kindergarden:templates/site/childrens.jinja2')
 def childrens(request):
     ch_list = session_db.query(Children).all()
-    return {}
+    return {'children_with_parents': ch_list}
 
 
