@@ -1,9 +1,8 @@
-{% extends 'garden/main.html' %}
-{% load static %}
+{% extends 'kindergarden:templates/site/main.jinja2' %}
 
 {% block css %}
-    <link rel="stylesheet" href="${request.static_url('kindergarden:static/css/site/childrens.css')}">
-    <link rel="stylesheet" href="${request.static_url('kindergarden:static/css/site/child-detail.css')}">
+    <link rel="stylesheet" href="{{request.static_url('kindergarden:static/css/site/childrens.css')}}">
+    <link rel="stylesheet" href="{{request.static_url('kindergarden:static/css/site/child-detail.css')}}">
 {% endblock css %}
 
 {% block modal %}
@@ -112,7 +111,7 @@
                             <li>
                                 <a href="#">
                                     <i class="fa fa-circle-o"></i>
-                                    Друк з поточними нашалаштуваннями
+                                    Друк з поточними наалаштуваннями
                                 </a>
                             </li>
                             <li>
@@ -137,29 +136,37 @@
                 {% else %}
                     <h3>Створення нового вихованця садочка</h3>
                 {% endif %}
-                <form action="." method="post" enctype="multipart/form-data">{% csrf_token %}
+                <form action="{{request.route_url('children_action',action=action)}}" method="post" enctype="multipart/form-data">
                     <div class="detail-content-wrapper">
                         <div class="line-img-personal-info">
                             <div class="img-container">
                                 <div class="img-wrapper">
-    {#                                            <img src="img/boy.jpg" alt="">#}
                                     {% if image %}
                                         <img src="{{ image }}" alt="#">
                                     {% else %}
-                                        <img src="{% static 'img/no-image.png' %}" alt="#">
+                                        <img src="{{request.static_url('kindergarden:static/img/no-image.png')}}" alt="#">
                                     {% endif %}
                                 </div>
                             </div>
                             <div class="personal-info-container">
                                 <div class="pic-name">
                                     {{ form.non_field_errors }}
+                                    {{ form.slug }}
+                                    {% if form.errors %}
+                                        <ul class="errors">
+                                            {% for field_name, field_errors in form.errors|dictsort if field_errors %}
+                                                {% for error in field_errors %}
+                                                    <li>{{ form[field_name].label }}: {{ error }}</li>
+                                                {% endfor %}
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
                                     <div class="input-group">
                                         <span class="label-wrp label-req" data-img="\f000">ПІБ</span>
                                         {{ form.fullname }}
                                     </div>
                                     <div class="input-group">
                                         <span class="label-wrp label-req">Дата народження</span>
-    {#                                                <input class="input-wrp" name="date-of-birth" type="date" value="07/08/2013">#}
                                         <div class="date-select-wrapper">
                                             {{ form.date_of_birth }}
                                         </div>
@@ -186,7 +193,7 @@
                                     </div>
                                     <div class="input-group">
                                         <span class="label-wrp label-req" data-img="\f000">Група</span>
-                                        {{ form.actual_group }}
+                                        {{ form.group_id }}
                                     </div>
                                     <div class="input-group">
                                         <span class="label-wrp label-req" data-img="\f000">Адреса</span>
@@ -195,7 +202,6 @@
                                     <div class="pic-commands">
                                         <div class="button-wrapper">
                                             <label for="id_child-image">Додати фотографію</label>
-    {#                                        <input type="file" id="add-photo">#}
                                             {{ form.image }}
                                         </div>
                                         <div class="button-wrapper">
@@ -218,9 +224,8 @@
                             </div>
                             <div class="tabs-content">
                                 <div class="tab active-tab">
-
                                     <ul class="list-parents">
-                                        {{ formset.management_form }}
+{#                                        {{ formset.management_form }}#}
                                         <li class="lst-parent" id="lst-title">
                                             <div class="field-container">
                                                 <p>П.І.Б / Дата народження/ Телефон</p>
@@ -238,110 +243,110 @@
                                                 <p></p>
                                             </div>
                                         </li>
-                                        {% for form_ in formset %}
-                                        {{ form_.non_field_errors }}
-                                            <li class="lst-parent" id="lst-{{ forloop.counter0 }}" data-operation="" data-delete="">
-                                            <div class="field-container">
-                                                <div class="top-line">
-    {#                                                <input type="text" name="parent_name" value="Буняк Володимир Сергійович" readonly>#}
-                                                    {{ form_.fullname }}
-                                                    {{ form_.id }}
-                                                    {{ form_.child }}
-                                                </div>
-                                                <div class="bottom-line">
-                                                    <div class="lst-date-birth">
-        {#                                                <input type="date" name="parent_date" value="2018-07-01" readonly>#}
-                                                        {{ form_.date_of_birth }}
+                                        {% for parent_form in form.parents.entries %}
+{#                                            {{ form_.non_field_errors }}#}
+                                                <li class="lst-parent" id="lst-{{ loop.index }}" data-operation="" data-delete="">
+                                                    <div class="field-container">
+                                                    <div class="top-line">
+{#                                                        <input type="text" name="parent_name" value="Буняк Володимир Сергійович" readonly>#}
+                                                        {{ parent_form.form.fullname }}
+                                                        {{ parent_form.form.id }}
+                                                        {{ parent_form.form.child }}
                                                     </div>
-                                                    <div class="lst-phone">
-            {#                                            <input type="text" name="parent_phone" value="0969945947" readonly>#}
-                                                        {{ form_.phone }}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="field-container">
-                                                <div class="top-line">
-                                                    <div class="lst-type">
-    {#                                                    <input type="text" name="parent_relation" value="Батько" readonly>#}
-                                                       {{ form_.relation }}
+                                                    <div class="bottom-line">
+                                                        <div class="lst-date-birth">
+{#                                                            <input type="date" name="parent_date" value="2018-07-01" readonly>#}
+                                                            {{ parent_form.form.date_of_birth }}
+                                                        </div>
+                                                        <div class="lst-phone">
+{#                                                            <input type="text" name="parent_phone" value="0969945947" readonly>#}
+                                                            {{ parent_form.form.phone }}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div class="bottom-line">
-                                                    <div class="lst-posada">
-    {#                                                    <input type="text" name="parent_workplace" value="Програміст" readonly>#}
-                                                        {{ form_.workplace }}
+                                                <div class="field-container">
+                                                    <div class="top-line">
+                                                        <div class="lst-type">
+                                                            <input type="text" name="parent_relation" value="Батько" readonly>
+                                                           {{ parent_form.form.relation }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="bottom-line">
+                                                        <div class="lst-posada">
+{#                                                            <input type="text" name="parent_workplace" value="Програміст" readonly>#}
+                                                            {{ parent_form.form.workplace }}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="field-container">
-                                                <div class="lst-work">
-    {#                                                <textarea name="parent_work" readonly>Україна, Тернопільська область, м.Тернопіль Приватне підприємство "Укрспецінформ"</textarea>#}
-                                                    {{ form_.work }}
+                                                <div class="field-container">
+                                                    <div class="lst-work">
+{#                                                        <textarea name="parent_work" readonly>Україна, Тернопільська область, м.Тернопіль Приватне підприємство "Укрспецінформ"</textarea>#}
+                                                        {{ parent_form.form.work }}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="field-container">
-                                                <div class="lst-address">
-    {#                                                <textarea name="parent_work" readonly>Україна, Тернопільська область, м.Тернопіль Приватне підприємство "Укрспецінформ"</textarea>#}
-                                                    {{ form_.address }}
+                                                <div class="field-container">
+                                                    <div class="lst-address">
+{#                                                        <textarea name="parent_work" readonly>Україна, Тернопільська область, м.Тернопіль Приватне підприємство "Укрспецінформ"</textarea>#}
+                                                        {{ parent_form.form.address }}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="field-container">
-                                                <div class="lst-change">
-                                                    <a href="#" class="change-parent-info">Змінити</a>
-                                                    <a href="#" class="delete-parent-info">Вилучити</a>
-                                                    {{ form_.DELETE }}
+                                                <div class="field-container">
+                                                    <div class="lst-change">
+                                                        <a href="#" class="change-parent-info">Змінити</a>
+                                                        <a href="#" class="delete-parent-info">Вилучити</a>
+{#                                                        {{ form_.DELETE }}#}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </li>
+                                            </li>
                                         {% endfor %}
                                     </ul>
                                 </div>
                                 <div class="tab">
-                                    <ul class="pay-group-list">
-                                        {{ pay_formset.management_form }}
-                                        <li class="pay-group-elem pay-group-title">
-                                            <div class="pay-account">
-                                                <span>Порядок</span>
-                                            </div>
-                                            <div class="pay-group">
-                                                <span>Відношення до тарифу</span>
-                                            </div>
-                                            <div class="pay-start">
-                                                <span>Початок</span>
-                                            </div>
-                                            <div class="pay-end">
-                                                <span>Закінчення</span>
-                                            </div>
-                                            <div class="pay-status">
-                                                <span>Активність</span>
-                                            </div>
-                                        </li>
-                                        {% for form_pay in pay_formset %}
-                                        {{ form_pay.non_field_errors }}
-                                        <li class="pay-group-elem">
-                                            <div class="pay-account">
-                                                {{ form_.id }}
-                                                <div class="account-wrapper">
-                                                   {{ forloop.counter }}
-                                                </div>
-                                            </div>
-                                            <div class="pay-group">
-                                                {{ form_pay.payment_group }}
-                                            </div>
-                                            <div class="pay-start">
-                                                {{ form_pay.date_start }}
-                                            </div>
-                                            <div class="pay-end">
-                                                {{ form_pay.date_end }}
-                                            </div>
-                                            <div class="pay-status">
-                                                {{ form_pay.enable }}
-                                            </div>
-                                            {{ form_.DELETE }}
-                                        </li>
-
-                                        {% endfor %}
-                                    </ul>
+{#                                    <ul class="pay-group-list">#}
+{#                                        {{ pay_formset.management_form }}#}
+{#                                        <li class="pay-group-elem pay-group-title">#}
+{#                                            <div class="pay-account">#}
+{#                                                <span>Порядок</span>#}
+{#                                            </div>#}
+{#                                            <div class="pay-group">#}
+{#                                                <span>Відношення до тарифу</span>#}
+{#                                            </div>#}
+{#                                            <div class="pay-start">#}
+{#                                                <span>Початок</span>#}
+{#                                            </div>#}
+{#                                            <div class="pay-end">#}
+{#                                                <span>Закінчення</span>#}
+{#                                            </div>#}
+{#                                            <div class="pay-status">#}
+{#                                                <span>Активність</span>#}
+{#                                            </div>#}
+{#                                        </li>#}
+{#                                        {% for form_pay in pay_formset %}#}
+{#                                        {{ form_pay.non_field_errors }}#}
+{#                                        <li class="pay-group-elem">#}
+{#                                            <div class="pay-account">#}
+{#                                                {{ form_.id }}#}
+{#                                                <div class="account-wrapper">#}
+{#                                                   {{ forloop.counter }}#}
+{#                                                </div>#}
+{#                                            </div>#}
+{#                                            <div class="pay-group">#}
+{#                                                {{ form_pay.payment_group }}#}
+{#                                            </div>#}
+{#                                            <div class="pay-start">#}
+{#                                                {{ form_pay.date_start }}#}
+{#                                            </div>#}
+{#                                            <div class="pay-end">#}
+{#                                                {{ form_pay.date_end }}#}
+{#                                            </div>#}
+{#                                            <div class="pay-status">#}
+{#                                                {{ form_pay.enable }}#}
+{#                                            </div>#}
+{#                                            {{ form_.DELETE }}#}
+{#                                        </li>#}
+{##}
+{#                                        {% endfor %}#}
+{#                                    </ul>#}
                                 </div>
                                 <div class="tab">
                                     <h3>Третя вкладка</h3>

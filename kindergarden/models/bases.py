@@ -127,7 +127,7 @@ class Children(Base):
     date_of_birth = Column(Date, nullable=True)
     growth = Column(Integer, default=0)
     weight = Column(Numeric(8, 2), default=0)
-    image = Column(LargeBinary, nullable = True)
+    image = Column(Text, nullable = True)
     slug = Column(Text, nullable=True, unique=True)
     actual = Column(Boolean, default=True, nullable=False)
     date_start = Column(Date, nullable=True)
