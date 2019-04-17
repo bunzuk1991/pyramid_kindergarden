@@ -598,6 +598,18 @@
               margin-bottom: 3px;
               height: 126px;
 
+              &:nth-child(1) {
+                height: auto;
+                background: #648c9a;
+                text-align: center;
+                margin-bottom: 0;
+                margin-right: 0;
+                color: #fff;
+                font-weight: bolder;
+                text-transform: uppercase;
+                font-size: 14px;
+              }
+
               .field-container {
 
               &.hidden {
@@ -747,6 +759,10 @@
                   }
                 }
               }
+            }
+
+            #lst-title {
+              background: grey;
             }
 
             .parent-deleted {

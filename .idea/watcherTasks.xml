@@ -2,14 +2,14 @@
 <project version="4">
   <component name="ProjectTasksOptions">
     <TaskOptions isEnabled="true">
-      <option name="arguments" value="--no-cache --update $FileName$:$ProjectFileDir$\static\css\site\$FileNameWithoutExtension$.css" />
+      <option name="arguments" value="--no-cache --update --no-cache --update $FileName$:$ProjectFileDir$/kindergarden/static/css/site/$FileNameWithoutExtension$.css --style compressed" />
       <option name="checkSyntaxErrors" value="true" />
       <option name="description" />
       <option name="exitCodeBehavior" value="ERROR" />
       <option name="fileExtension" value="scss" />
       <option name="immediateSync" value="true" />
       <option name="name" value="Compass SCSS" />
-      <option name="output" value="$ProjectFileDir$\static\css\site\$FileNameWithoutExtension$.css" />
+      <option name="output" value="$ProjectFileDir$\kindergarden\static\css\site\$FileNameWithoutExtension$.css" />
       <option name="outputFilters">
         <array />
       </option>
