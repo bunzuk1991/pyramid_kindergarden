@@ -243,78 +243,7 @@
         color: #585858;
       }
 
-      .input-wrp {
-        outline: none;
-        font-size: 14px;
-        height: 26px;
-        padding: 0 0 0 10px;
-        box-sizing: border-box;
-        display: block;
-        width: calc(100% - 150px);
-        border: 1px solid #afafaf;
-
-        select {
-          padding-left: 5px !important;
-        }
-      }
-
-      .date-select-wrapper {
-        width: calc(100% - 150px);
-        font-size: 14px;
-        height: 26px;
-        box-sizing: border-box;
-        display: flex;
-
-        select {
-         outline: none;
-        }
-
-        select:nth-child(1) {
-          width: 50%;
-        }
-        select:nth-child(2) {
-          width: 20%;
-          margin-left: 5px;
-        }
-        select:nth-child(3) {
-          width: 30%;
-          margin-left: 5px;
-        }
-      }
-
-      .label-wrp {
-        padding-left: 5px;
-        font-size: 17px;
-        display: block;
-        background: #8c8c8c;
-        color: #ffffff;
-        height: 26px;
-        line-height: 26px;
-        width: 150px;
-        position: relative;
-        box-sizing: border-box;
-
-        &:after {
-          //content: '';
-          font-family: FontAwesome;
-          position: absolute;
-          display: block;
-          height: 100%;
-          width: 30px;
-          background: #4c4c4c;
-          top: 0;
-          right: 0;
-          text-align: center;
-          font-weight: normal;
-          color: white;
-        }
-      }
-      .label-req:after {
-        //content: '\f046';
-      }
-
       .detail-content-wrapper {
-
         width: 90%;
         margin: 0 auto;
         background: #739c63c2;
@@ -402,34 +331,85 @@
                 }
               }
 
-              .input-container {
-                display: flex;
+              .date-select-wrapper {
+                  display: flex;
 
-                div:nth-child(1) {
-                  width: 50%;
-                }
-                div:nth-child(2) {
-                  width: 50%;
-                  margin-left: 10px;
-                }
+                  select {
+                      width: 100%;
+                      margin-right: 7px;
+                      padding: 3px 0 3px 1px;
+                      color: #282828;
+                      border: 1px solid #f0547e57;
+                      border-radius: 5px;
+                      background: #f9f6fe;
+                      font-size: 12px;
+
+                      &:nth-child(1) {
+                          max-width: 150px;
+                      }
+
+                      &:last-child {
+                          margin-right: 0;
+                      }
+                  }
               }
 
-              .input-group {
-                margin-bottom: 10px;
-                display: flex;
+              legend {
+                  background-color: #000;
+                  color: #fff;
+                  padding: 3px 6px;
+              }
 
-                select {
-                  padding-left: 5px;
+              .group-line {
+                  display: flex;
+
+                  div:nth-child(1) {
+                      max-width: 150px;
+                  }
+
+                  div:nth-child(2) {
+                      margin-left: 7px;
+                      width: calc(100% - 157px);
+                  }
+
+              }
+
+            .input-group {
+                margin-bottom: 10px;
+                // margin-right: 7px;
+
+                .label-wrp {
+                    display: block;
+                    padding-bottom: 3px;
+                    padding-left: 2px;
+                    text-transform: uppercase;
+                    font-size: 10px;
+                    font-weight: bolder;
+                    color: #237437;
+                }
+
+                .input-wrp {
+                    width: 100%;
+                    padding: 5px;
+                    border: 1px solid #f0547e57;
+                    color: #282828;
+                    border-radius: 5px;
+                    background: #f9f6fe;
+                    font-size: 12px;
+                    display: block;
+                    box-sizing: border-box;
                 }
 
                 .non-resize-text-area {
-                  resize: none;
-                  height: 52px;
-                  width: calc(100% - 150px);
-                  padding: 0 0 0 10px;
-                  box-sizing: border-box;
+                    resize: none;
+                    height: 52px;
+                    width: calc(100% - 150px);
+                    padding: 0 0 0 10px;
+                    box-sizing: border-box;
                 }
-              }
+            }
+
+
               .pic-commands {
                 display: flex;
                 align-items: center;

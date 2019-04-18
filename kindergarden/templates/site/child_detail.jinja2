@@ -162,16 +162,18 @@
                                         </ul>
                                     {% endif %}
                                     <div class="input-group">
-                                        <span class="label-wrp label-req" data-img="\f000">ПІБ</span>
+                                        <span class="label-wrp label-req">П.І.П</span>
                                         {{ form.fullname }}
                                     </div>
+
                                     <div class="input-group">
                                         <span class="label-wrp label-req">Дата народження</span>
                                         <div class="date-select-wrapper">
                                             {{ form.date_of_birth }}
                                         </div>
                                     </div>
-                                    <div class="input-container">
+
+                                    <div class="group-line">
                                         <div class="input-group">
                                             <span class="label-wrp label-req">Ріст (см.)</span>
                                             {{ form.growth }}
@@ -181,7 +183,8 @@
                                             {{ form.weight }}
                                         </div>
                                     </div>
-                                    <div class="input-container">
+
+                                    <div class="group-line">
                                         <div class="input-group">
                                             <span class="label-wrp label-req">Дата початку</span>
                                             {{ form.date_start }}
@@ -191,14 +194,17 @@
                                             {{ form.date_end }}
                                         </div>
                                     </div>
+
                                     <div class="input-group">
                                         <span class="label-wrp label-req" data-img="\f000">Група</span>
                                         {{ form.group_id }}
                                     </div>
+
                                     <div class="input-group">
                                         <span class="label-wrp label-req" data-img="\f000">Адреса</span>
                                         {{ form.address }}
                                     </div>
+
                                     <div class="pic-commands">
                                         <div class="button-wrapper">
                                             <label for="id_child-image">Додати фотографію</label>
