@@ -140,6 +140,9 @@
                     <div class="detail-content-wrapper">
                         <div class="line-img-personal-info">
                             <div class="img-container">
+                                <div class="group-title">
+                                    <h3>Фотографія</h3>
+                                </div>
                                 <div class="img-wrapper">
                                     {% if image %}
                                         <img src="{{ image }}" alt="#">
@@ -149,29 +152,21 @@
                                 </div>
                             </div>
                             <div class="personal-info-container">
-                                <div class="pic-commands">
-        <div class="button-wrapper">
-            <label for="id_child-image">Додати фотографію</label>
-            {{ form.image }}
-        </div>
-        <div class="button-wrapper">
-            <a href="#" id="add-parent">Додати батьків</a>
-        </div>
-        <div class="button-wrapper">
-            <button type="submit" id="save-child">Записати та закрити</button>
-        </div>
-    </div>
-                                <div class="pic-name">
+                                <div class="personal-info-left">
+                                    <div class="group-title">
+                                        <h3>Фотографія</h3>
+                                    </div>
+                                    <div class="pic-name">
                                     {{ form.non_field_errors }}
                                     {{ form.slug }}
                                     {% if form.errors %}
-                                        <ul class="errors">
-                                            {% for field_name, field_errors in form.errors|dictsort if field_errors %}
-                                                {% for error in field_errors %}
-                                                    <li>{{ form[field_name].label }}: {{ error }}</li>
-                                                {% endfor %}
+                                    <ul class="errors">
+                                        {% for field_name, field_errors in form.errors|dictsort if field_errors %}
+                                            {% for error in field_errors %}
+                                                <li>{{ form[field_name].label }}: {{ error }}</li>
                                             {% endfor %}
-                                        </ul>
+                                        {% endfor %}
+                                    </ul>
                                     {% endif %}
                                     <div class="input-group">
                                         <span class="label-wrp label-req">П.І.П</span>
@@ -217,9 +212,29 @@
                                         {{ form.address }}
                                     </div>
                                 </div>
+                                </div>
+                                <div class="personal-info-right">
+                                     <div class="group-title">
+                                        <h3>Фотографія</h3>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="comand-container">
-
+                            <div class="comands-container">
+                                <div class="group-title">
+                                    <h3>Фотографія</h3>
+                                </div>
+                                <div class="pic-commands">
+                                    <div class="button-wrapper">
+                                        <label for="id_child-image">Додати фотографію</label>
+                                        {{ form.image }}
+                                    </div>
+                                    <div class="button-wrapper">
+                                        <a href="#" id="add-parent">Додати батьків</a>
+                                    </div>
+                                    <div class="button-wrapper">
+                                        <button type="submit" id="save-child">Записати та закрити</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="line-parents">
@@ -233,41 +248,19 @@
                             <div class="tabs-content">
                                 <div class="tab active-tab">
                                     <ul class="list-parents">
-{#                                        {{ formset.management_form }}#}
-{#                                        <li class="lst-parent" id="lst-title">#}
-{#                                            <div class="field-container">#}
-{#                                                <p>П.І.Б / Дата народження/ Телефон</p>#}
-{#                                            </div>#}
-{#                                            <div class="field-container">#}
-{#                                                <p>Відношення / посада</p>#}
-{#                                            </div>#}
-{#                                            <div class="field-container">#}
-{#                                                <p>Місце роботи</p>#}
-{#                                            </div>#}
-{#                                            <div class="field-container">#}
-{#                                                <p>Адреса</p>#}
-{#                                            </div>#}
-{#                                            <div class="field-container">#}
-{#                                                <p></p>#}
-{#                                            </div>#}
-{#                                        </li>#}
                                         {% for parent_form in form.parents.entries %}
-{#                                            {{ form_.non_field_errors }}#}
                                                 <li class="lst-parent" id="lst-{{ loop.index }}" data-operation="" data-delete="">
                                                     <div class="field-container">
                                                     <div class="top-line">
-{#                                                        <input type="text" name="parent_name" value="Буняк Володимир Сергійович" readonly>#}
                                                         {{ parent_form.form.fullname }}
                                                         {{ parent_form.form.id }}
                                                         {{ parent_form.form.child }}
                                                     </div>
                                                     <div class="bottom-line">
                                                         <div class="lst-date-birth">
-{#                                                            <input type="date" name="parent_date" value="2018-07-01" readonly>#}
                                                             {{ parent_form.form.date_of_birth }}
                                                         </div>
                                                         <div class="lst-phone">
-{#                                                            <input type="text" name="parent_phone" value="0969945947" readonly>#}
                                                             {{ parent_form.form.phone }}
                                                         </div>
                                                     </div>
@@ -281,20 +274,17 @@
                                                     </div>
                                                     <div class="bottom-line">
                                                         <div class="lst-posada">
-{#                                                            <input type="text" name="parent_workplace" value="Програміст" readonly>#}
                                                             {{ parent_form.form.workplace }}
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="field-container">
                                                     <div class="lst-work">
-{#                                                        <textarea name="parent_work" readonly>Україна, Тернопільська область, м.Тернопіль Приватне підприємство "Укрспецінформ"</textarea>#}
                                                         {{ parent_form.form.work }}
                                                     </div>
                                                 </div>
                                                 <div class="field-container">
                                                     <div class="lst-address">
-{#                                                        <textarea name="parent_work" readonly>Україна, Тернопільська область, м.Тернопіль Приватне підприємство "Укрспецінформ"</textarea>#}
                                                         {{ parent_form.form.address }}
                                                     </div>
                                                 </div>
@@ -302,7 +292,6 @@
                                                     <div class="lst-change">
                                                         <a href="#" class="change-parent-info">Змінити</a>
                                                         <a href="#" class="delete-parent-info">Вилучити</a>
-{#                                                        {{ form_.DELETE }}#}
                                                     </div>
                                                 </div>
                                             </li>
@@ -310,51 +299,51 @@
                                     </ul>
                                 </div>
                                 <div class="tab">
-{#                                    <ul class="pay-group-list">#}
-{#                                        {{ pay_formset.management_form }}#}
-{#                                        <li class="pay-group-elem pay-group-title">#}
-{#                                            <div class="pay-account">#}
-{#                                                <span>Порядок</span>#}
-{#                                            </div>#}
-{#                                            <div class="pay-group">#}
-{#                                                <span>Відношення до тарифу</span>#}
-{#                                            </div>#}
-{#                                            <div class="pay-start">#}
-{#                                                <span>Початок</span>#}
-{#                                            </div>#}
-{#                                            <div class="pay-end">#}
-{#                                                <span>Закінчення</span>#}
-{#                                            </div>#}
-{#                                            <div class="pay-status">#}
-{#                                                <span>Активність</span>#}
-{#                                            </div>#}
-{#                                        </li>#}
-{#                                        {% for form_pay in pay_formset %}#}
-{#                                        {{ form_pay.non_field_errors }}#}
-{#                                        <li class="pay-group-elem">#}
-{#                                            <div class="pay-account">#}
-{#                                                {{ form_.id }}#}
-{#                                                <div class="account-wrapper">#}
-{#                                                   {{ forloop.counter }}#}
-{#                                                </div>#}
-{#                                            </div>#}
-{#                                            <div class="pay-group">#}
-{#                                                {{ form_pay.payment_group }}#}
-{#                                            </div>#}
-{#                                            <div class="pay-start">#}
-{#                                                {{ form_pay.date_start }}#}
-{#                                            </div>#}
-{#                                            <div class="pay-end">#}
-{#                                                {{ form_pay.date_end }}#}
-{#                                            </div>#}
-{#                                            <div class="pay-status">#}
-{#                                                {{ form_pay.enable }}#}
-{#                                            </div>#}
-{#                                            {{ form_.DELETE }}#}
-{#                                        </li>#}
-{##}
-{#                                        {% endfor %}#}
-{#                                    </ul>#}
+                                {#                                    <ul class="pay-group-list">#}
+                                {#                                        {{ pay_formset.management_form }}#}
+                                {#                                        <li class="pay-group-elem pay-group-title">#}
+                                {#                                            <div class="pay-account">#}
+                                {#                                                <span>Порядок</span>#}
+                                {#                                            </div>#}
+                                {#                                            <div class="pay-group">#}
+                                {#                                                <span>Відношення до тарифу</span>#}
+                                {#                                            </div>#}
+                                {#                                            <div class="pay-start">#}
+                                {#                                                <span>Початок</span>#}
+                                {#                                            </div>#}
+                                {#                                            <div class="pay-end">#}
+                                {#                                                <span>Закінчення</span>#}
+                                {#                                            </div>#}
+                                {#                                            <div class="pay-status">#}
+                                {#                                                <span>Активність</span>#}
+                                {#                                            </div>#}
+                                {#                                        </li>#}
+                                {#                                        {% for form_pay in pay_formset %}#}
+                                {#                                        {{ form_pay.non_field_errors }}#}
+                                {#                                        <li class="pay-group-elem">#}
+                                {#                                            <div class="pay-account">#}
+                                {#                                                {{ form_.id }}#}
+                                {#                                                <div class="account-wrapper">#}
+                                {#                                                   {{ forloop.counter }}#}
+                                {#                                                </div>#}
+                                {#                                            </div>#}
+                                {#                                            <div class="pay-group">#}
+                                {#                                                {{ form_pay.payment_group }}#}
+                                {#                                            </div>#}
+                                {#                                            <div class="pay-start">#}
+                                {#                                                {{ form_pay.date_start }}#}
+                                {#                                            </div>#}
+                                {#                                            <div class="pay-end">#}
+                                {#                                                {{ form_pay.date_end }}#}
+                                {#                                            </div>#}
+                                {#                                            <div class="pay-status">#}
+                                {#                                                {{ form_pay.enable }}#}
+                                {#                                            </div>#}
+                                {#                                            {{ form_.DELETE }}#}
+                                {#                                        </li>#}
+                                {##}
+                                {#                                        {% endfor %}#}
+                                {#                                    </ul>#}
                                 </div>
                                 <div class="tab">
                                     <h3>Третя вкладка</h3>
