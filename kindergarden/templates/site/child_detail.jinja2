@@ -141,7 +141,9 @@
                         <div class="line-img-personal-info">
                             <div class="img-container">
                                 <div class="group-title">
-                                    <h3>Фотографія</h3>
+                                    <p>
+                                        <span>Фото</span>
+                                    </p>
                                 </div>
                                 <div class="img-wrapper">
                                     {% if image %}
@@ -154,7 +156,9 @@
                             <div class="personal-info-container">
                                 <div class="personal-info-left">
                                     <div class="group-title">
-                                        <h3>Фотографія</h3>
+                                        <p>
+                                            <span>Персональна інформація</span>
+                                        </p>
                                     </div>
                                     <div class="pic-name">
                                     {{ form.non_field_errors }}
@@ -215,13 +219,69 @@
                                 </div>
                                 <div class="personal-info-right">
                                      <div class="group-title">
-                                        <h3>Фотографія</h3>
+                                        <p>
+                                            <span>Довідки від лікаря</span>
+                                        </p>
+                                    </div>
+                                    <div class="dovidku">
+                                        <ul>
+                                            <li class="dovidku-row">
+                                                <span>1</span>
+                                                <div class="dovidku-top">
+                                                    <input type="text" value="26.04.2019">
+                                                    <input type="text" value="№ 10">
+                                                </div>
+                                                <div class="dovidku-bottom">
+                                                    <input type="text" value="Заревенна Людмила Іванівна">
+                                                </div>
+                                                <a href="#" class="change"></a>
+                                                <a href="#" class="delete"></a>
+                                            </li>
+                                            <li class="dovidku-row">
+                                                <span>2</span>
+                                                <div class="dovidku-top">
+                                                    <input type="text" value="20.02.2019">
+                                                    <input type="text" value="№ 10-56">
+                                                </div>
+                                                <div class="dovidku-bottom">
+                                                    <input type="text" value="Заревенна Людмила Іванівна">
+                                                </div>
+                                                <a href="#" class="change"></a>
+                                                <a href="#" class="delete"></a>
+                                            </li>
+                                            <li class="dovidku-row">
+                                                <span>3</span>
+                                                <div class="dovidku-top">
+                                                    <input type="text" value="20.02.2019">
+                                                    <input type="text" value="№ 10-56">
+                                                </div>
+                                                <div class="dovidku-bottom">
+                                                    <input type="text" value="Заревенна Людмила Іванівна">
+                                                </div>
+                                                <a href="#" class="change"></a>
+                                                <a href="#" class="delete"></a>
+                                            </li>
+                                            <li class="dovidku-row">
+                                                <span>4</span>
+                                                <div class="dovidku-top">
+                                                    <input type="text" value="20.02.2019">
+                                                    <input type="text" value="№ 10-56">
+                                                </div>
+                                                <div class="dovidku-bottom">
+                                                    <input type="text" value="Заревенна Людмила Іванівна">
+                                                </div>
+                                                <a href="#" class="change"></a>
+                                                <a href="#" class="delete"></a>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
                             <div class="comands-container">
                                 <div class="group-title">
-                                    <h3>Фотографія</h3>
+                                    <p>
+                                        <span>Комнади форми</span>
+                                    </p>
                                 </div>
                                 <div class="pic-commands">
                                     <div class="button-wrapper">
@@ -230,6 +290,9 @@
                                     </div>
                                     <div class="button-wrapper">
                                         <a href="#" id="add-parent">Додати батьків</a>
+                                    </div>
+                                    <div class="button-wrapper">
+                                        <a href="#" id="add-dovidka">Додати довідку</a>
                                     </div>
                                     <div class="button-wrapper">
                                         <button type="submit" id="save-child">Записати та закрити</button>
@@ -249,8 +312,8 @@
                                 <div class="tab active-tab">
                                     <ul class="list-parents">
                                         {% for parent_form in form.parents.entries %}
-                                                <li class="lst-parent" id="lst-{{ loop.index }}" data-operation="" data-delete="">
-                                                    <div class="field-container">
+                                            <li class="lst-parent" id="lst-{{ loop.index }}" data-operation="" data-delete="">
+                                                <div class="field-container">
                                                     <div class="top-line">
                                                         {{ parent_form.form.fullname }}
                                                         {{ parent_form.form.id }}

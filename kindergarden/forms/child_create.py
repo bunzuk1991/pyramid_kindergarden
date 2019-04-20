@@ -43,7 +43,7 @@ class ParentForm(Form):
     work = TextAreaField(u'Місце проживання', [validators.InputRequired(message=u'Введіть місце роботи'),
                                                    validators.Length(min=1, max=255)],
                             render_kw=RENDER_KW['readonly'])
-    workplace = TextAreaField(u'Посада', [validators.InputRequired(message=u'Введіть посаду'),
+    workplace = StringField(u'Посада', [validators.InputRequired(message=u'Введіть посаду'),
                                                 validators.Length(min=1, max=255)],
                          render_kw=RENDER_KW['readonly'])
 
