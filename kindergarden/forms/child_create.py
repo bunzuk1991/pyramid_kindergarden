@@ -16,7 +16,7 @@ from wtforms import (
 from wtforms import PasswordField, FileField
 from wtforms.widgets import HiddenInput, Select, TextInput
 from .widgets import SelectFieldDate
-from wtforms.fields.html5 import TelField
+from kindergarden.services.utils import upload_file
 
 from kindergarden.models.bases import Group, session_db
 
@@ -49,6 +49,8 @@ class ParentForm(Form):
 
 
 class ChildCreateForm(Form):
+    __do_not_populate__ = ['image']
+
     group_choices = [(g.id, g.name) for g in session_db.query(Group).order_by('name').all()]
 
     group_id = SelectField(u'Group', [validators.InputRequired(message=u'Оберіть групу із списку')], render_kw=RENDER_KW['all_fields'], coerce=int)
@@ -62,7 +64,7 @@ class ChildCreateForm(Form):
     weight = DecimalField(u'Вага (кг.)', [validators.InputRequired(message=u'введіть ріст в сантиметрах'),
                                           validators.NumberRange(min=5, max=150, message=u'Мабуть дитина заважка:)')],
                           places=2, render_kw=RENDER_KW['all_fields'])
-    image = FileField(u'Фотокартка дитини', render_kw={'id': 'id_child-image'})
+    image = FileField(u'Фотокартка дитини', [validators.Optional()], render_kw={'id': 'id_child-image'})
     date_start = DateField(u'Початок навчання', [validators.InputRequired()], render_kw=RENDER_KW['date-picker'])
     date_end = DateField(u'Закінчення навчання', [validators.Optional()], render_kw=RENDER_KW['date-picker'])
     address = TextAreaField(u'Адреса проживання', [validators.InputRequired(message=u'Введіть П.І.П дитини'),
@@ -72,4 +74,7 @@ class ChildCreateForm(Form):
 
     parents = FieldList(FormField(ParentForm), min_entries=0)
 
-
+    def populate_obj(self, obj):
+        for name, field in self._fields.items():
+            if name not in self.__do_not_populate__:
+                field.populate_obj(obj, name)

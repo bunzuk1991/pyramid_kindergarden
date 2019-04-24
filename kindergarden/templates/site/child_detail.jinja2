@@ -132,7 +132,7 @@
             </div>
             <div class="child-details" id="child-slug" data-slug="{{ slug }}">
                 {% if slug %}
-                    <h3>Особиста інформація по {{ name }}</h3>
+                    <h3>Особиста інформація по {{ form.fullname }}</h3>
                 {% else %}
                     <h3>Створення нового вихованця садочка</h3>
                 {% endif %}
@@ -147,7 +147,7 @@
                                 </div>
                                 <div class="img-wrapper">
                                     {% if image %}
-                                        <img src="{{ image }}" alt="#">
+                                        <img src="{{request.static_url('kindergarden:static/models_image/' + image)}}" alt="#">
                                     {% else %}
                                         <img src="{{request.static_url('kindergarden:static/img/no-image.png')}}" alt="#">
                                     {% endif %}

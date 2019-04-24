@@ -3,6 +3,7 @@ from pyramid.response import Response
 from pyramid.httpexceptions import HTTPNotFound, HTTPFound
 from ..models.bases import *
 from ..forms.child_create import ChildCreateForm, ParentForm
+from ..services.utils import upload_file
 
 
 @view_config(route_name='dashboard', renderer='kindergarden:templates/site/main.jinja2')
@@ -33,11 +34,16 @@ def child_detail(request):
         form.group_id.choices = group_choices
 
         if request.method == 'POST' and form.validate():
+            image_name = upload_file(form.image)
+
+            if image_name:
+                child.image = image_name
+
             form.populate_obj(child)
             return HTTPFound(
                 location=request.route_url('childrens'))
 
-        return {'form': form, 'action': request.matchdict.get('action'), 'slug': child_slug}
+        return {'form': form, 'action': request.matchdict.get('action'), 'slug': child_slug, 'image': child.image}
 
 
     else:

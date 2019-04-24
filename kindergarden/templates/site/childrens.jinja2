@@ -67,7 +67,7 @@
                         <li>
                             <div class="cl-img">
                                 {% if elem.image %}
-                                    <img src="#" alt="#">
+                                    <img src="{{request.static_url('kindergarden:static/models_image/' + elem.image)}}" alt="#">
                                 {% else %}
                                     <img src="{{request.static_url('kindergarden:static/img/no-image.png')}}" alt="#">
                                 {% endif %}
