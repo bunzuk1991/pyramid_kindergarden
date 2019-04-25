@@ -39,6 +39,8 @@ def child_detail(request):
             if image_name:
                 child.image = image_name
 
+
+
             form.populate_obj(child)
             return HTTPFound(
                 location=request.route_url('childrens'))

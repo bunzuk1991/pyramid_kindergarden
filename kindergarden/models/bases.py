@@ -134,8 +134,7 @@ class Children(Base):
     date_end = Column(Date, nullable=True)
     address = Column(UnicodeText, nullable=False, default="")
 
-    parents = relationship('Parent', backref='child',
-                                lazy='dynamic')
+    parents = relationship('Parent', backref='child', lazy='dynamic', cascade="all, delete, delete-orphan")
 
     def __str__(self):
         return self.fullname
@@ -164,7 +163,7 @@ class Relation(Base):
 class Parent(Base):
     __tablename__ = 'parent'
     id = Column(Integer, primary_key=True)
-    child_id = Column(Integer, ForeignKey('children.id'), nullable=False)
+    child_id = Column(Integer, ForeignKey('children.id'), nullable=True)
     relation_id = Column(Integer, ForeignKey('relation.id'), nullable=False)
     fullname = Column(UnicodeText, nullable=False, default="")
     date_of_birth = Column(Date, nullable=True)

@@ -31,6 +31,26 @@ RENDER_KW = {
 }
 
 
+class FieldListMixin(FieldList):
+    def populate_obj(self, obj, name):
+        # while len(getattr(obj, name)) < len(self.entries):
+        #     newModel = self.model()
+        #     session_db.add(newModel)
+        #     getattr(obj, name).append(newModel)
+        entries_list = {x.data['id']: x for x in self.entries}
+
+        for parent in getattr(obj, name):
+            if parent.id not in entries_list:
+                getattr(obj, name).remove(parent)
+        super(FieldListMixin, self).populate_obj(obj, name)
+
+        #
+        #
+        # while getattr(obj, name).count() > len(self.entries):
+        #     session_db.delete(getattr(obj, name).remove())
+        # super(FieldListMixin, self).populate_obj(obj, name)
+
+
 class ParentForm(Form):
     relation_choices = [(g.id, g.name) for g in session_db.query(Relation).order_by('name')]
 
@@ -82,7 +102,7 @@ class ChildCreateForm(Form):
                             render_kw=RENDER_KW['text-area-non-resize'])
     slug = StringField(widget=HiddenInput())
 
-    parents = FieldList(FormField(ParentForm), min_entries=1, _prefix='PR')
+    parents = FieldListMixin(FormField(ParentForm), min_entries=0, _prefix='PR')
 
     def populate_obj(self, obj):
         for name, field in self._fields.items():
