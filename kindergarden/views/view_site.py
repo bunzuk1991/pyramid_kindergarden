@@ -34,7 +34,7 @@ def child_detail(request):
         form.group_id.choices = group_choices
 
         if request.method == 'POST' and form.validate():
-            image_name = upload_file(form.image)
+            image_name = upload_file(form.image, resize_image=True)
 
             if image_name:
                 child.image = image_name
@@ -43,10 +43,8 @@ def child_detail(request):
             return HTTPFound(
                 location=request.route_url('childrens'))
 
-        return {'form': form, 'action': request.matchdict.get('action'), 'slug': child_slug, 'image': child.image}
-
-
+        return {'form': form, 'action': request.matchdict.get('action'), 'slug': child_slug, 'image': child.image,
+                'name': child.fullname}
     else:
         # створення нового елемента таблиці CHILD
         pass
-

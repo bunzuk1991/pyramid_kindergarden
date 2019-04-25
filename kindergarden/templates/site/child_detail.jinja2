@@ -132,11 +132,14 @@
             </div>
             <div class="child-details" id="child-slug" data-slug="{{ slug }}">
                 {% if slug %}
-                    <h3>Особиста інформація по {{ form.fullname }}</h3>
+                    <h3>Особиста інформація по {{ name }}</h3>
                 {% else %}
                     <h3>Створення нового вихованця садочка</h3>
                 {% endif %}
                 <form action="{{request.route_url('children_action',action=action)}}" method="post" enctype="multipart/form-data">
+                    {% if form.hidden_tag is defined %}
+                        {{ form.hidden_tag() }}
+                    {% endif %}
                     <div class="detail-content-wrapper">
                         <div class="line-img-personal-info">
                             <div class="img-container">
@@ -147,7 +150,7 @@
                                 </div>
                                 <div class="img-wrapper">
                                     {% if image %}
-                                        <img src="{{request.static_url('kindergarden:static/models_image/' + image)}}" alt="#">
+                                        <img src="{{request.static_url('kindergarden:static/models_thumbnails/' + image)}}" alt="#">
                                     {% else %}
                                         <img src="{{request.static_url('kindergarden:static/img/no-image.png')}}" alt="#">
                                     {% endif %}
@@ -173,7 +176,7 @@
                                     </ul>
                                     {% endif %}
                                     <div class="input-group">
-                                        <span class="label-wrp label-req">П.І.П</span>
+                                        <span class="label-wrp label-req">Прізвище, ім’я та по-батькові</span>
                                         {{ form.fullname }}
                                     </div>
 
@@ -312,12 +315,12 @@
                                 <div class="tab active-tab">
                                     <ul class="list-parents">
                                         {% for parent_form in form.parents.entries %}
-                                            <li class="lst-parent" id="lst-{{ loop.index }}" data-operation="" data-delete="">
+                                            <li class="lst-parent" id="{{ parent_form.id }}" data-operation="" data-delete="">
                                                 <div class="field-container">
                                                     <div class="top-line">
                                                         {{ parent_form.form.fullname }}
                                                         {{ parent_form.form.id }}
-                                                        {{ parent_form.form.child }}
+                                                        {{ parent_form.form.child_id }}
                                                     </div>
                                                     <div class="bottom-line">
                                                         <div class="lst-date-birth">
@@ -331,8 +334,7 @@
                                                 <div class="field-container">
                                                     <div class="top-line">
                                                         <div class="lst-type">
-                                                            <input type="text" name="parent_relation" value="Батько" readonly>
-                                                           {{ parent_form.form.relation }}
+                                                           {{ parent_form.form.relation_id }}
                                                         </div>
                                                     </div>
                                                     <div class="bottom-line">

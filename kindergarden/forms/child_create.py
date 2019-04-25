@@ -18,7 +18,7 @@ from wtforms.widgets import HiddenInput, Select, TextInput
 from .widgets import SelectFieldDate
 from kindergarden.services.utils import upload_file
 
-from kindergarden.models.bases import Group, session_db
+from kindergarden.models.bases import Group, Relation, session_db
 
 RENDER_KW = {
     'all_fields': {'class': 'input-wrp'},
@@ -32,20 +32,29 @@ RENDER_KW = {
 
 
 class ParentForm(Form):
-    relation_id = SelectField(u'Relation', [validators.InputRequired()], render_kw=RENDER_KW['readonly'], coerce=int)
+    relation_choices = [(g.id, g.name) for g in session_db.query(Relation).order_by('name')]
+
+    id = IntegerField(u'id', [validators.InputRequired()], render_kw=RENDER_KW['readonly'], widget=HiddenInput())
+    child_id = IntegerField(u'child_id', [validators.InputRequired()], render_kw=RENDER_KW['readonly'],
+                            widget=HiddenInput())
+    relation_id = SelectField(u'Relation', [validators.InputRequired()], render_kw=RENDER_KW['readonly'],
+                              choices=relation_choices, coerce=int)
     fullname = StringField(u'Full name', [validators.InputRequired(message=u'Введіть П.І.П'),
                                           validators.Length(min=1, max=255)], render_kw=RENDER_KW['readonly'])
     date_of_birth = DateField(u'Дата народження', [validators.InputRequired()], render_kw=RENDER_KW['readonly'])
     phone = StringField(u'Full name', [validators.InputRequired(message=u'Введіть мобільний телефон'),
-                                          validators.Length(min=1, max=15), validators], render_kw=RENDER_KW['readonly'])
+                                       validators.Length(min=1, max=15)], render_kw=RENDER_KW['readonly'])
     address = TextAreaField(u'Адреса проживання', [validators.Length(min=1, max=255), validators.Optional()],
                             render_kw=RENDER_KW['text-area-no-cols'])
-    work = TextAreaField(u'Місце проживання', [validators.InputRequired(message=u'Введіть місце роботи'),
-                                                   validators.Length(min=1, max=255)],
-                            render_kw=RENDER_KW['readonly'])
-    workplace = StringField(u'Посада', [validators.InputRequired(message=u'Введіть посаду'),
-                                                validators.Length(min=1, max=255)],
+    work = TextAreaField(u'Місце проживання', [validators.Optional(),
+                                               validators.Length(min=1, max=255)],
                          render_kw=RENDER_KW['readonly'])
+    workplace = StringField(u'Посада', [validators.Optional(),
+                                        validators.Length(min=1, max=255)],
+                            render_kw=RENDER_KW['readonly'])
+
+    def validate(self):
+        return True
 
 
 class ChildCreateForm(Form):
@@ -53,7 +62,8 @@ class ChildCreateForm(Form):
 
     group_choices = [(g.id, g.name) for g in session_db.query(Group).order_by('name').all()]
 
-    group_id = SelectField(u'Group', [validators.InputRequired(message=u'Оберіть групу із списку')], render_kw=RENDER_KW['all_fields'], coerce=int)
+    group_id = SelectField(u'Group', [validators.InputRequired(message=u'Оберіть групу із списку')],
+                           render_kw=RENDER_KW['all_fields'], coerce=int)
     fullname = StringField(u'Full name', [validators.InputRequired(message=u'Введіть П.І.П дитини'),
                                           validators.Length(min=1, max=255)], render_kw=RENDER_KW['all_fields'])
     date_of_birth = SelectFieldDate(u'Date of birth', format='%d %m %Y')
@@ -72,7 +82,7 @@ class ChildCreateForm(Form):
                             render_kw=RENDER_KW['text-area-non-resize'])
     slug = StringField(widget=HiddenInput())
 
-    parents = FieldList(FormField(ParentForm), min_entries=0)
+    parents = FieldList(FormField(ParentForm), min_entries=1, _prefix='PR')
 
     def populate_obj(self, obj):
         for name, field in self._fields.items():
