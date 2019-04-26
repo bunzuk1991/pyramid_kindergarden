@@ -69,11 +69,16 @@ function convertDate(textDate) {
     return date_converted;
 }
 
+function getlast_element(selector) {
+    let elem = $(selector + ':last');
+    return elem
+}
+
 function returnParentHtml(id, name, date_of_birth, phone, work, posada, relations, address, parent_id, newitem){
 
     let textHtml = '';
-    let id_num = id.replace(/lst-/g, "");
-    let prefix = 'parent-' + id_num + '-';
+    let id_num = id.replace(/parents-/g, "");
+    let prefix = 'parents-' + id_num + '-';
     let text_replace;
 
     if (newitem) {
@@ -84,15 +89,16 @@ function returnParentHtml(id, name, date_of_birth, phone, work, posada, relation
 
     let textHtml_prev = '<div class="field-container">'
              +   '<div class="top-line">'
-             +       '<input type="text" name="' + prefix + 'fullname" value="' + name + '" readonly maxlength="200" class="input-wrp" id="id_' + prefix + 'fullname">'
-             +       '<input type="hidden" name="' + prefix + 'id"' + text_replace + ' class="input-wrp" id="id_' + prefix + 'id">'
+             +       '<input type="text" name="' + prefix + 'fullname" value="' + name + '" readonly required="" id="' + prefix + 'fullname">'
+             +       '<input type="hidden" name="' + prefix + 'id"' + text_replace + ' id="' + prefix + 'id">'
+             +       '<input type="hidden" name="' + prefix + 'child_id"' + text_replace + ' id="' + prefix + 'id">'
              +   '</div>'
              +   '<div class="bottom-line">'
              +      '<div class="lst-date-birth">'
-             +           '<input type="text" name="' + prefix + 'date_of_birth" value="' + date_of_birth + '" readonly class="input-wrp" id="id_' + prefix + 'date_of_birth">'
+             +           '<input type="text" name="' + prefix + 'date_of_birth" value="' + date_of_birth + '" readonly required="" id="' + prefix + 'date_of_birth">'
              +       '</div>'
              +       '<div class="lst-phone">'
-             +           '<input type="text" name="' + prefix + 'phone" value="' + phone + '" readonly maxlength="40" class="input-wrp" id="id_' + prefix + 'phone">'
+             +           '<input type="text" name="' + prefix + 'phone" value="' + phone + '" readonly required="" id="' + prefix + 'phone">'
              +       '</div>'
              +   '</div>'
              +'</div>'
@@ -104,25 +110,24 @@ function returnParentHtml(id, name, date_of_birth, phone, work, posada, relation
              +   '</div>'
              +   '<div class="bottom-line">'
              +       '<div class="lst-posada">'
-             +           '<input type="text" name="' + prefix + 'workplace" value="' + posada + '" readonly maxlength="90" class="input-wrp" id="id_' + prefix + 'workplace">'
+             +           '<input type="text" name="' + prefix + 'workplace" value="' + posada + '" readonly readonly="" id="' + prefix + 'workplace">'
              +       '</div>'
              +  '</div>'
              + '</div>'
              + '<div class="field-container">'
              +   '<div class="lst-work">'
-             +       '<textarea name="' + prefix + 'work" cols="None" rows="None" readonly maxlength="250" class="input-wrp" id="id_' + prefix + 'work">' + work + '</textarea>'
+             +       '<textarea name="' + prefix + 'work" cols="None" rows="None" readonly maxlength="250" id="' + prefix + 'work">' + work + '</textarea>'
              +   '</div>'
              + '</div>'
-             + '<div class="field-container hidden">'
+             + '<div class="field-container">'
              +   '<div class="lst-address">'
-             +       '<textarea name="' + prefix + 'address" cols="40" rows="10" readonly maxlength="250" class="input-wrp" id="id_' + prefix + 'address">' + address + '</textarea>'
+             +       '<textarea name="' + prefix + 'address" cols="40" rows="None" readonly maxlength="250" id="' + prefix + 'address">' + address + '</textarea>'
              +   '</div>'
              + '</div>'
              + '<div class="field-container">'
              +   '<div class="lst-change">'
              +       '<a href="#" class="change-parent-info">Змінити</a>'
              +       '<a href="#" class="delete-parent-info">Вилучити</a>'
-             +       '<input type="checkbox" name="' + prefix + 'DELETE" id="id_' + prefix + 'DELETE">'
              +   '</div>'
              + '</div>';
 
@@ -255,7 +260,7 @@ $( document ).ready(function() {
         if (last_element.length === 0) {
            last_id = 0;
         } else {
-            last_id = +last_element.attr('id').replace(/lst-/g, "");
+            last_id = +last_element.attr('id').replace(/parents-/g, "");
             last_id += 1;
             // last_id = last_element.length + 1;
         }
@@ -265,7 +270,7 @@ $( document ).ready(function() {
         let oper_type = modal.find('#operation-type');
 
         form_id.attr('value', 'lst-' + last_id);
-        form_id.val('lst-' + last_id);
+        form_id.val('parents-' + last_id);
         oper_type.attr('data-type', '1');
         modal.addClass('opened');
     });
@@ -277,10 +282,8 @@ $( document ).ready(function() {
             id = form.find('input[name="form-id"]').val(),
             select_value = $('.select-value').attr('data-value'),
             select_option = $('.select-item'),
-            total_forms_tag = $('#id_parent-TOTAL_FORMS'),
-            total_forms_val = +total_forms_tag.val() + 1,
             error_element = form.find('#error_element'),
-            textHtml = '<select name="parent-' + id.replace(/lst-/g, "") + '-relation" id=' + '"id_parent-' + id.replace(/lst-/g, "") + '-relation"' + '>';
+            textHtml = '<select name="parents-' + id.replace(/parents-/g, "") + '-relation" id=' + '"id_parent-' + id.replace(/parents-/g, "") + '-relation"' + '>';
 
         for (i=0; i<select_option.length; i++) {
            let current_elem = select_option[i];
@@ -313,7 +316,7 @@ $( document ).ready(function() {
 
                 let new_item = returnParentHtml(id, name, date_of_birth, phone, work, place, textHtml, address, parent_id, true);
                 $('.list-parents').append(new_item);
-                total_forms_tag.attr('value', total_forms_val);
+
             } else {
                 let new_item = returnParentHtml(id, name, date_of_birth, phone, work, place, textHtml, address, parent_id, false);
                 let elem = $("#" + id);
@@ -350,7 +353,7 @@ $( document ).ready(function() {
         e.preventDefault();
         let current_element = $(this).closest('.lst-parent');
         let id_parent = current_element.attr('id');
-        let num_id = id_parent.replace(/lst-/g, "");
+        let num_id = id_parent.replace(/parents-/g, "");
 
         let fullname = current_element.find('#' + 'id_parent-' + num_id + '-fullname').val(),
             date_of_birth = current_element.find('#' + 'id_parent-' + num_id + '-date_of_birth').val(),
@@ -398,7 +401,7 @@ $( document ).ready(function() {
         if (current_element.attr("data-operation") === "added") {
             total_forms_tag.val(total_forms_val);
         }
-        current_element.find('input[id$=DELETE]').prop('checked', true);
+        // current_element.find('input[id$=DELETE]').prop('checked', true);
         current_element.addClass('parent-deleted');
         current_element.attr('data-delete', 'true');
     });

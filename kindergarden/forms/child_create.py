@@ -102,7 +102,7 @@ class ChildCreateForm(Form):
                             render_kw=RENDER_KW['text-area-non-resize'])
     slug = StringField(widget=HiddenInput())
 
-    parents = FieldListMixin(FormField(ParentForm), min_entries=0, _prefix='PR')
+    parents = FieldListMixin(FormField(ParentForm), min_entries=0)
 
     def populate_obj(self, obj):
         for name, field in self._fields.items():
